@@ -4,27 +4,56 @@
 \name{EPop-class}
 \alias{EPop-class}
 \alias{show,EPop-method}
+\alias{initDynamics}
+\alias{asEPop}
 \title{Epidemy Population}
 \usage{
 \S4method{show}{EPop}(object)
+
+initDynamics(ePop, simParam = NULL)
+
+asEPop(from, group_list = NULL, donor_list = NULL, simParam = NULL)
 }
 \arguments{
-\item{object}{a 'Pop' object}
+\item{ePop}{an \code{\link{EPop-class}} object}
 
-\item{x}{a 'Pop' object}
+\item{simParam}{simulation parameter (of type SimParamEpidemy)}
 
-\item{i}{index of individuals}
+\item{from}{source object (Pop-class)}
 
-\item{...}{additional 'Pop' objects}
+\item{group_list}{list of groups for the population. Each group is a separate
+epidemy. If NULL it is assumed there is only one group}
+
+\item{donor_list}{list of 0s and 1s indicating susceptible and donor 
+individuals, respectively. If any other number is passed this will cause an
+error. If NULL, it is assumed there is one donor per group.}
+}
+\value{
+the same input object ePop with the field `dynamics` initialised.
 }
 \description{
 A population with an epidemy. Extends \code{\link[AlphaSimR:Pop-class]{Pop}}
 class from AlphaSimR package to include a new slot and override some of
 the methods.
 }
-\section{Methods (by generic)}{
+\details{
+The dynamics field is data.table with several columns,
+- Timing columns: these depend on the model used. They are supposed to be
+  stored in the simParam and will be extracted from it
+- status: these also depend on the model used. In general they are the 
+  letters that define the model, e.g., SIR will have states S, I, and R
+- generation: Which type of infection is it, i.e., primary, secondary, etc.
+  Initially set to 1 for all donors
+- infected_by: the index of the individual that infects a given individual 
+- group_inf: group infectivity level
+}
+\section{Functions}{
 \itemize{
-\item \code{show(EPop)}: Show epidmey population summary
+\item \code{show(EPop)}: Show epidemy population summary
+
+\item \code{initDynamics()}: initialises the dynamic object
+
+\item \code{asEPop()}: coerces into EPop-class from Pop-class
 
 }}
 \section{Slots}{
@@ -62,7 +91,7 @@ nodes with the items for individuals in the population (see example in
 \code{\link[AlphaSimR:newPop]{newPop}}) - we support vectors and matrices or
 objects that have a generic length and subset method.
 This list is normally empty and exists solely as an
-open slot available for uses to store extra information about
+open slot available for users to store extra information about
 individuals.}
 
 \item{\code{miscPop}}{a list of any length containing optional meta data for the

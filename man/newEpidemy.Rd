@@ -2,7 +2,7 @@
 % Please edit documentation in R/Class-EPop.R
 \name{newEpidemy}
 \alias{newEpidemy}
-\title{Create new Epopulation}
+\title{Create a new population with epidemy (EPop)}
 \usage{
 newEpidemy(
   rawPop,
@@ -17,21 +17,30 @@ newEpidemy(
 \item{rawPop}{an object of \code{\link[AlphaSimR:MapPop-class]{MapPop}} or
 \code{\link[AlphaSimR:NamedMapPop-class]{NamedMapPop}}}
 
+\item{group_list}{list of groups for the population. Each group is a separate
+epidemy. If NULL it is assumed there is only one group}
+
+\item{donor_list}{list of 0s and 1s indicating susceptible and donor 
+individuals, respectively. If any other number is passed this will cause an
+error. If NULL, it is assumed there is one donor per group.}
+
 \item{simParam}{an object of \code{\link{SimParamEpidemy}}}
 
 \item{nThreads}{number of threads to use if OpenMP is available.
-If \code{NULL}, the number is obtained from code_simParam$nThreads.}
+If \code{NULL}, the number is obtained from \code{simParam$nThreads}.}
 
-\item{...}{additional arguments used internally (passed to \code{\link[AlphaSimR:Pop-class]{Pop}})}
+\item{...}{additional arguments used internally (passed to 
+\code{\link[AlphaSimR:Pop-class]{newPop}})}
 }
 \value{
-Returns an object of \code{\link{EPop-class}}
+Returns an object of \code{\link{EPop-class}} with a new slot 
+ `dynamics`. See \code{\link{initDynamics}} for details
 }
 \description{
 Creates an initial \code{\link{EPop-class}} from an object of
 \code{\link[AlphaSimR:MapPop-class]{MapPop}} or
 \code{\link[AlphaSimR:NamedMapPop-class]{NamedMapPop}}.
-This will use AlphaSimR `new` function for
+This will use AlphaSimR `newPop` function for
 \code{\link[AlphaSimR:Pop-class]{Pop}}. Then, it will also embed relevant
 info from SP in it.
 }

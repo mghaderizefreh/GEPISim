@@ -48,7 +48,7 @@
 #'
 #' \eqn{P=e^{P}}
 #' @name setPheno
-#' @rdname setPheno
+#' @rdname phenotypes
 #' @export
 setMethod(
   "setPheno",
@@ -95,7 +95,7 @@ setMethod(
     varP_half <- (varE + varG) / 2.
 
     if (is.null(stnd)){
-      pop@phen <- exp(pop@pheno)
+      pop@pheno <- exp(pop@pheno)
     }
     if (stnd == 'shift'){
       #shift all the phenotypes and then exponentiate
@@ -107,7 +107,7 @@ setMethod(
       pop@pheno <- sweep(popexp, 2, colMeans(popexp), `/`)
     }
     else{
-      pop@phen <- exp(pop@pheno)
+      pop@pheno <- exp(pop@pheno)
     }
     return(pop)
   })
