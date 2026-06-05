@@ -1,6 +1,6 @@
 # fmt: skip file
 
-#' epiAlphaSimR: AlphaSimR extension for epidemies
+#' EpidemicSimR: AlphaSimR extension for epidemies
 #'
 #' Currently in development
 #'
@@ -8,6 +8,6 @@
 #' @import AlphaSimR
 #' @importFrom purrr walk map
 #' @importFrom R6 R6Class
-#' @name epiAlphaSimR
+#' @name EpidemicSimR
 "_PACKAGE"
 NULL

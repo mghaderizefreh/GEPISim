@@ -4,7 +4,7 @@
 \alias{setPheno}
 \title{Sets phenotypes for epidemiological traits}
 \usage{
-\S4method{setPheno}{EPop}(
+\S4method{setPheno}{PopEpidemic}(
   pop,
   h2 = NULL,
   H2 = NULL,
@@ -20,7 +20,7 @@
 )
 }
 \arguments{
-\item{pop}{an object of \code{\link{EPop-class}}}
+\item{pop}{an object of \code{\link{PopEpidemic-class}}}
 
 \item{h2}{a vector of desired narrow-sense heritabilities for
 each trait. See details.}
@@ -55,7 +55,7 @@ the traits without standardising in any way. See details for how each works.}
 }
 \description{
 Extends \code{\link[AlphaSimR]{setPheno}} for objects of class
-\code{\link{EPop-class}} to scale multiplicative traits in an epidemiological
+\code{\link{PopEpidemic-class}} to scale multiplicative traits in an epidemiological
 model such that they have an expected mean of 1 (if desired).
 }
 \details{

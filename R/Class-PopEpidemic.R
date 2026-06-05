@@ -1,6 +1,6 @@
-# EPop --------------------------------------------------------------------
+# PopEpidemic --------------------------------------------------------------------
 
-#' @title Epidemy Population
+#' @title Epidemic Population
 #'
 #' @description
 #' A population with an epidemy. Extends \code{\link[AlphaSimR:Pop-class]{Pop}}
@@ -35,17 +35,17 @@
 #' This list is empty unless information is supplied by the user.
 #' Note that the list is emptied every time the population is subsetted or
 #' combined because the meta data for old population might not be valid anymore.
-#' @name EPop-class
-#' @rdname EPop-class
-#' @exportClass EPop
-setClass("EPop",
+#' @name PopEpidemic-class
+#' @rdname PopEpidemic-class
+#' @exportClass PopEpidemic
+setClass("PopEpidemic",
          slots=c(dynamics = 'ANY'),
          contains="Pop")
 
-#' @title Create a new population with epidemy (EPop)
+#' @title Create a new population with epidemy (PopEpidemic)
 #'
 #' @description
-#' Creates an initial \code{\link{EPop-class}} from an object of
+#' Creates an initial \code{\link{PopEpidemic-class}} from an object of
 #' \code{\link[AlphaSimR:MapPop-class]{MapPop}} or
 #' \code{\link[AlphaSimR:NamedMapPop-class]{NamedMapPop}}.
 #' This will use AlphaSimR `newPop` function for
@@ -59,30 +59,30 @@ setClass("EPop",
 #' @param donor_list list of 0s and 1s indicating susceptible and donor 
 #'   individuals, respectively. If any other number is passed this will cause an
 #'   error. If NULL, it is assumed there is one donor per group.
-#' @param simParam an object of \code{\link{SimParamEpidemy}}
+#' @param simParam an object of \code{\link{SimParamEpidemic}}
 #' @param nThreads number of threads to use if OpenMP is available.
 #' If \code{NULL}, the number is obtained from \code{simParam$nThreads}.
 #' @param ... additional arguments used internally (passed to 
 #' \code{\link[AlphaSimR:Pop-class]{newPop}})
 #'
-#' @return Returns an object of \code{\link{EPop-class}} with a new slot 
+#' @return Returns an object of \code{\link{PopEpidemic-class}} with a new slot 
 #'  `dynamics`. See \code{\link{initDynamics}} for details
 #'
-#' @seealso \code{\link[AlphaSimR:Pop-class]{Pop}}, \code{\link{SimParamEpidemy}}
+#' @seealso \code{\link[AlphaSimR:Pop-class]{Pop}}, \code{\link{SimParamEpidemic}}
 #'
 #' @examples
 #' #Create founder haplotypes
 #' founderPop = quickHaplo(nInd=2, nChr=1, segSites=10)
 #'
 #' #Set simulation parameters
-#' SP = SimParamEpidemy$new(founderPop, model = "SIR")
+#' SP = SimParamEpidemic$new(founderPop, model = "SIR")
 #' SP$addTraitA(var = c(1,1,1))
 #'
 #' #Create population
-#' pop = newEpidemy(founderPop)
+#' pop = newPopEpidemic(founderPop)
 #'
 #' @export
-newEpidemy <- function(rawPop, group_list = NULL, donor_list = NULL,
+newPopEpidemic <- function(rawPop, group_list = NULL, donor_list = NULL,
                       simParam=NULL,nThreads=NULL,...){
   if(is.null(simParam)){
     simParam = get("SP",envir=.GlobalEnv)
@@ -94,14 +94,14 @@ newEpidemy <- function(rawPop, group_list = NULL, donor_list = NULL,
   }
   pop <- AlphaSimR::newPop(rawPop, simParam, nThreads, ...)
 
-  asEPop(pop, simParam = simParam, group_list = group_list,
+  asPopEpidemic(pop, simParam = simParam, group_list = group_list,
          donor_list = donor_list)
 }
 
-#' @describeIn EPop-class Show epidemy population summary
+#' @describeIn PopEpidemic-class Show epidemy population summary
 #' @export
 setMethod("show",
-          signature(object = "EPop"),
+          signature(object = "PopEpidemic"),
           function (object){
             cat("An object of class",
                 class(object), "\n")
@@ -116,9 +116,9 @@ setMethod("show",
           }
 )
 
-#' @describeIn EPop-class initialises the dynamic object
-#' @param ePop an \code{\link{EPop-class}} object
-#' @param simParam simulation parameter of type \code{\link{SimParamEpidemy}}
+#' @describeIn PopEpidemic-class initialises the dynamic object
+#' @param ePop an \code{\link{PopEpidemic-class}} object
+#' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
 #' @return the same input object ePop with the field `dynamics` initialised.
 #' @details
 #' The dynamics field is data.table with several columns,
@@ -137,11 +137,11 @@ initDynamics <- function(ePop, simParam=NULL){
   }
   # some checks
   stopifnot(
-    # Validate simParam is SimParamEpidemy
-    "simParam must be a SimParamEpidemy object"=
-      is(simParam, "SimParamEpidemy"),
-    "object must be an EPop object"=
-      is(ePop, "EPop")
+    # Validate simParam is SimParamEpidemic
+    "simParam must be a SimParamEpidemic object"=
+      is(simParam, "SimParamEpidemic"),
+    "object must be an PopEpidemic object"=
+      is(ePop, "PopEpidemic")
   )
   
   # add timing columns
@@ -159,16 +159,16 @@ initDynamics <- function(ePop, simParam=NULL){
   ePop
 }
 
-#' @describeIn EPop-class coerces into EPop-class from Pop-class
+#' @describeIn PopEpidemic-class coerces into PopEpidemic-class from Pop-class
 #' @param from source object (Pop-class)
 #' @param group_list list of groups for the population. Each group is a separate
 #'   epidemy. If NULL it is assumed there is only one group
 #' @param donor_list list of 0s and 1s indicating susceptible and donor 
 #'   individuals, respectively. If any other number is passed this will cause an
 #'   error. If NULL, it is assumed there is one donor per group.
-#' @param simParam simulation parameter (of type SimParamEpidemy)
+#' @param simParam simulation parameter (of type SimParamEpidemic)
 #' @export
-asEPop <- function(from, group_list = NULL, donor_list = NULL, simParam = NULL){
+asPopEpidemic <- function(from, group_list = NULL, donor_list = NULL, simParam = NULL){
   if (is.null(group_list)){ # if no group provided, assume only 1 group
     group_list <- rep(1L, from@nInd)
   }
@@ -183,8 +183,8 @@ asEPop <- function(from, group_list = NULL, donor_list = NULL, simParam = NULL){
   
   # some checks
   stopifnot(
-    # Validate simParam is SimParamEpidemy
-    "simParam must be a SimParamEpidemy object"=
+    # Validate simParam is SimParamEpidemic
+    "simParam must be a SimParamEpidemic object"=
       is(simParam, "SimParam"),
     #Ensure group_list length matches number of individuals
     "group_list must have equal elements to number of individuals"=
@@ -207,7 +207,7 @@ asEPop <- function(from, group_list = NULL, donor_list = NULL, simParam = NULL){
   dynamics <- data.table(donor = donor_list, group = group_list)
   
   out <- new(
-    "EPop", nInd=from@nInd, nChr=from@nChr, ploidy=from@ploidy, 
+    "PopEpidemic", nInd=from@nInd, nChr=from@nChr, ploidy=from@ploidy, 
     nLoci=from@nLoci, sex=from@sex, geno=from@geno, id=from@id, iid=from@iid, 
     mother=from@mother, father=from@father, fixEff=rep(1L,from@nInd), 
     misc=list(), miscPop=list(), nTraits=simParam$nTraits, gv=from@gv, 

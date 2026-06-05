@@ -2,8 +2,8 @@
 #' @description
 #' General wrapper for all compartmental model
 #' @param epop A population with an epidemy, an object of class
-#' \code{\link{EPop-class}}
-#' @param simParam a \code{\link{SimParamEpidemy}} object
+#' \code{\link{PopEpidemic-class}}
+#' @param simParam a \code{\link{SimParamEpidemic}} object
 #' @name run
 #' @rdname run
 #' @export
@@ -19,19 +19,19 @@ run <- function(epop,simParam=NULL){
 #'  (or Removed)).
 #'
 #' @param epop A population with an epidemy, an object of class
-#' \code{\link{EPop-class}}
-#' @param simParam a \code{\link{SimParamEpidemy}} object
+#' \code{\link{PopEpidemic-class}}
+#' @param simParam a \code{\link{SimParamEpidemic}} object
 #'
-#' @return Returns the same input object of type \code{\link{EPop-class}} with
+#' @return Returns the same input object of type \code{\link{PopEpidemic-class}} with
 #'  the \code{dynamic} field populated with evolution of the epidemy
 modelSIR <- function(epop, simParam = NULL) {
   DEBUG <- F
   if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
 
-  stopifnot("simParam must be a SimParamEpidemy object"=
-              is(simParam, "SimParamEpidemy"),
-            "epop must be a EPop object"=
-              is(epop, "EPop"),
+  stopifnot("simParam must be a SimParamEpidemic object"=
+              is(simParam, "SimParamEpidemic"),
+            "epop must be a PopEpidemic object"=
+              is(epop, "PopEpidemic"),
             "Not an SIR model"=
               toupper(simParam$model)=="SIR")
 

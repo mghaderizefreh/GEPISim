@@ -8,9 +8,9 @@ run(epop, simParam = NULL)
 }
 \arguments{
 \item{epop}{A population with an epidemy, an object of class
-\code{\link{EPop-class}}}
+\code{\link{PopEpidemic-class}}}
 
-\item{simParam}{a \code{\link{SimParamEpidemy}} object}
+\item{simParam}{a \code{\link{SimParamEpidemic}} object}
 }
 \description{
 General wrapper for all compartmental model

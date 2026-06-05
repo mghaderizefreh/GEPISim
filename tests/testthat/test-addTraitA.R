@@ -9,7 +9,7 @@ founderPop = newMapPop(list(c(0)),
                                    nrow=4,ncol=1)))
 
 test_that("addTraitA",{
-  SP = SimParamEpidemy$new(founderPop=founderPop, model = "SIR")
+  SP = SimParamEpidemic$new(founderPop=founderPop, model = "SIR")
   SP$nThreads = 1L
   SP$addTraitA(nQtlPerChr=1,mean=0,var=1)
   pop = newPop(founderPop,simParam=SP)
@@ -31,10 +31,10 @@ test_that("addTraitA",{
 
 ## New tests ----
 
-# Helper to create a fresh SimParamEpidemy with a small founder population
+# Helper to create a fresh SimParamEpidemic with a small founder population
 .new_SP <- function(model = "SIR") {
   founderPop <- AlphaSimR::quickHaplo(nInd = 5, nChr = 1, segSites = 10)
-  SP <- SimParamEpidemy$new(founderPop, model = model)
+  SP <- SimParamEpidemic$new(founderPop, model = model)
   SP$nThreads <- 1L
   SP
 }

@@ -1,17 +1,17 @@
 library(testthat)
 library(AlphaSimR)
-test_that("newEpidemy basic construction and defaults work", {
+test_that("newPopEpidemic basic construction and defaults work", {
 
   set.seed(123)
 
   founderPop <- AlphaSimR::quickHaplo(nInd = 5, nChr = 1, segSites = 100)
-  SP <- SimParamEpidemy$new(founderPop, model = "SIR")
+  SP <- SimParamEpidemic$new(founderPop, model = "SIR")
   SP$addTraitA(nQtlPerChr = 10)
 
-  ep <- newEpidemy(founderPop, simParam = SP)
+  ep <- newPopEpidemic(founderPop, simParam = SP)
 
   # Class and basic slots
-  expect_s4_class(ep, "EPop")
+  expect_s4_class(ep, "PopEpidemic")
   expect_true(inherits(ep, "Pop"))
   expect_equal(ep@nInd, founderPop@nInd)
   expect_equal(ep@nTraits, SP$nTraits)
@@ -56,16 +56,16 @@ test_that("newEpidemy basic construction and defaults work", {
   expect_true(all(is.na(ep@dynamics$infected_by[nondonors_idx])))
 })
 
-test_that("newEpidemy honors provided group_list and donor_list", {
+test_that("newPopEpidemic honors provided group_list and donor_list", {
 
   founderPop <- AlphaSimR::quickHaplo(nInd = 5, nChr = 1, segSites = 50)
-  SP <- SimParamEpidemy$new(founderPop, model = "SIR")
+  SP <- SimParamEpidemic$new(founderPop, model = "SIR")
   SP$addTraitA(nQtlPerChr = 5)
 
   group_list <- c(1, 1, 2, 2, 2)
   donor_list <- c(1, 0, 0, 1, 0)
 
-  ep <- newEpidemy(founderPop, group_list = group_list,
+  ep <- newPopEpidemic(founderPop, group_list = group_list,
                    donor_list = donor_list, simParam = SP)
 
   expect_identical(as.integer(ep@dynamics$group), as.integer(group_list))
@@ -84,52 +84,52 @@ test_that("newEpidemy honors provided group_list and donor_list", {
   expect_true(all(is.na(ep@dynamics$infected_by[nondonors_idx])))
 })
 
-test_that("newEpidemy error handling works", {
+test_that("newPopEpidemic error handling works", {
 
   founderPop <- AlphaSimR::quickHaplo(nInd = 5, nChr = 1, segSites = 50)
   SPbase <- SimParam$new(founderPop)
-  SP <- SimParamEpidemy$new(founderPop, model = "SIR")
+  SP <- SimParamEpidemic$new(founderPop, model = "SIR")
   SP$addTraitA(nQtlPerChr = 5)
 
-  # simParam must be SimParamEpidemy; AlphaSimR SimParam is not enough
-  expect_error(newEpidemy(founderPop, simParam = SPbase),
-               "SimParamEpidemy")
+  # simParam must be SimParamEpidemic; AlphaSimR SimParam is not enough
+  expect_error(newPopEpidemic(founderPop, simParam = SPbase),
+               "SimParamEpidemic")
 
   # group_list length mismatch
-  expect_error(newEpidemy(founderPop, group_list = rep(1L, 4), simParam = SP),
+  expect_error(newPopEpidemic(founderPop, group_list = rep(1L, 4), simParam = SP),
                "group_list must have equal elements")
 
   # donor_list length mismatch
-  expect_error(newEpidemy(founderPop,
+  expect_error(newPopEpidemic(founderPop,
                           group_list = rep(1L, 5),
                           donor_list = c(1, 0, 0, 0),
                           simParam = SP),
                "donor_list must have the same length")
 
   # donor_list invalid values
-  expect_error(newEpidemy(founderPop,
+  expect_error(newPopEpidemic(founderPop,
                           group_list = rep(1L, 5),
                           donor_list = c(1, 0, 0, 2, 0),
                           simParam = SP),
                "donor_list must contain only 0 and 1 values")
 
   # must have at least one donor per group
-  expect_error(newEpidemy(founderPop,
+  expect_error(newPopEpidemic(founderPop,
                           group_list = c(1, 1, 2, 2, 2),
                           donor_list = c(1, 0, 0, 0, 0),
                           simParam = SP),
                "Each group must have at least one donor")
 })
 
-test_that("show(EPop) prints expected summary", {
+test_that("show(PopEpidemic) prints expected summary", {
   skip_if_not_installed("AlphaSimR")
 
   founderPop <- AlphaSimR::quickHaplo(nInd = 3, nChr = 1, segSites = 50)
-  SP <- SimParamEpidemy$new(founderPop, model = "SIR")
+  SP <- SimParamEpidemic$new(founderPop, model = "SIR")
   SP$addTraitA(nQtlPerChr = 5)
-  ep <- newEpidemy(founderPop, simParam = SP)
+  ep <- newPopEpidemic(founderPop, simParam = SP)
 
-  expect_output(show(ep), "EPop")
+  expect_output(show(ep), "PopEpidemic")
   expect_output(show(ep), "Ploidy:")
   expect_output(show(ep), "Individuals:")
   expect_output(show(ep), "Chromosomes:")

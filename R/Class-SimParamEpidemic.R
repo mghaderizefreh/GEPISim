@@ -1,18 +1,18 @@
-#' @rdname SimParamEpidemy
-#' @title Epidemy simulation parameter
+#' @rdname SimParamEpidemic
+#' @title Epidemic simulation parameter
 #'
 #' @description container for global epidemy simulation parameter. The users
 #' of this object assume it is stored in evironment as "SP", if this object
 #' is not explicitly passed. This is the practice in AlphaSimR and SimPlyBee
 #'
-#' @details This documentation shows details specific to \code{SimParamEpidemy}.
+#' @details This documentation shows details specific to \code{SimParamEpidemic}.
 #'   We suggest that you also read all the options provided by the AlphaSimR
 #'   \code{\link[AlphaSimR]{SimParam}}. Below we show minimal usage cases for
-#'   each \code{SimParamEpidemy} function.
+#'   each \code{SimParamEpidemic} function.
 #'
 #' @export
-SimParamEpidemy <- R6Class(
-  classname = "SimParamEpidemy",
+SimParamEpidemic <- R6Class(
+  classname = "SimParamEpidemic",
   inherit = SimParam,
 
   # Public ----
@@ -59,31 +59,31 @@ SimParamEpidemy <- R6Class(
 
 
     #' @description Starts the process of building a new simulation by creating
-    #'   a new SimParamEpidemy object and assigning a founder population of
+    #'   a new SimParamEpidemic object and assigning a founder population of
     #'   genomes to this object.
     #'
     #' @param founderPop an object of
     #'   \code{\link[AlphaSimR:Pop-class]{MapPop-class}}
     #'
-    #' @param model see \code{\link[epiAlphSimR]{SimParamEpidemy}} field
+    #' @param model see \code{\link[epiAlphSimR]{SimParamEpidemic}} field
     #'   \code{model}
     #'
-    #' @param removal_period see \code{\link[epiAlphSimR]{SimParamEpidemy}}
+    #' @param removal_period see \code{\link[epiAlphSimR]{SimParamEpidemic}}
     #'   field \code{removal_period}
     #'
-    #' @param r_beta see \code{\link[epiAlphSimR]{SimParamEpidemy}} field
+    #' @param r_beta see \code{\link[epiAlphSimR]{SimParamEpidemic}} field
     #'   \code{r_beta}
     #'
-    #' @param RP_shape \code{\link[epiAlphSimR]{SimParamEpidemy}} field
+    #' @param RP_shape \code{\link[epiAlphSimR]{SimParamEpidemic}} field
     #'   \code{RP_shape}
     #'
     #' @examples
     #' founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
-    #' SP <- SimParamEpidemy$new(founderGenomes) # default model is "SIR"
+    #' SP <- SimParamEpidemic$new(founderGenomes) # default model is "SIR"
     #' \dontshow{SP$nThreads = 1L}
     #'
     #' # there are only a few models to select from
-    #' try(SP <- SimParamEpidemy$new(founderGenomes, model = "ABC"))
+    #' try(SP <- SimParamEpidemic$new(founderGenomes, model = "ABC"))
     initialize = function(founderPop,
                           model = "SIR",
                           removal_period = 10,
@@ -94,7 +94,7 @@ SimParamEpidemy <- R6Class(
       stopifnot("provided model is not valid" = model %in% private$.validModels)
 
       super$initialize(founderPop)
-      private$.versionEpiAlphaSimR <- packageDescription("epiAlphaSimR")$Version
+      private$.versionEpidemicSimR <- packageDescription("EpidemicSimR")$Version
       self$model <- model
       self$removal_period = removal_period
       self$r_beta <- r_beta
@@ -116,7 +116,7 @@ SimParamEpidemy <- R6Class(
     #' \code{\link[AlphaSimR]{SimParam}} method \code{addTraitsA} except the
     #' mean is forced to be zero and names are automatically inferred from the
     #' field \code{epi_traits} of the object
-    #' \code{\link[epiAlphaSimR]{SimParamEpidemy}}
+    #' \code{\link[EpidemicSimR]{SimParamEpidemic}}
     #'
     #' @param nQtlPerChr number of QTLs per chromosome. Can be a single value or
     #'   nChr values.
@@ -128,17 +128,17 @@ SimParamEpidemy <- R6Class(
     #' @param corA a matrix of correlations between additive effects. If NULL is
     #'   passed, it will replaced by the identity matrix
     #' @param gamma should a gamma distribution be used instead of normal. This
-    #'   is not recommended for \code{\link[epiAlphaSimR]{SimParamEpidemy}}
+    #'   is not recommended for \code{\link[EpidemicSimR]{SimParamEpidemic}}
     #' @param shape the shape parameter for the gamma distribution
     #'   (the rate/scale parameter of the gamma distribution is accounted
     #'   for via the desired level of genetic variance, the var argument). This
-    #'   is not recommended for \code{\link[epiAlphaSimR]{SimParamEpidemy}}
+    #'   is not recommended for \code{\link[EpidemicSimR]{SimParamEpidemic}}
     #' @param force should the check for a running simulation be
     #' ignored. Only set to TRUE if you know what you are doing.
     #' @param name Name of the epidemiological traits. if NULL is passed, then
     #'   the names will be inferred from the model name, otherwise they should
     #'   match the field \code{epi_traits} of the object
-    #'   \code{\link[epiAlphaSimR]{SimParamEpidemy}}
+    #'   \code{\link[EpidemicSimR]{SimParamEpidemic}}
     #' @param nThreads number of threads to use if OpenMP is available.
     #' If \code{NULL}, the number is obtained from \code{self$nThreads}.
     #'
@@ -147,7 +147,7 @@ SimParamEpidemy <- R6Class(
     #' founderPop = quickHaplo(nInd=10, nChr=1, segSites=10)
     #'
     #' #Set simulation parameters
-    #' SP1 = SimParamEpidemy$new(founderPop, "SIR")
+    #' SP1 = SimParamEpidemic$new(founderPop, "SIR")
     #' SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
     #'
     #'
@@ -196,7 +196,7 @@ SimParamEpidemy <- R6Class(
   ),
   private = list(
     #### Private ----
-    .versionEpiAlphaSimR = "character",
+    .versionEpidemicSimR = "character",
 
     .validModels = c("SIR"),# c("SIR","SI","SIS","SEIR","SIDR","SEIDR")
 
@@ -231,13 +231,13 @@ SimParamEpidemy <- R6Class(
   ),
 
   active = list(
-    #' @field version list, versions of AlphaSimR and epiAlphaSimR packages used
+    #' @field version list, versions of AlphaSimR and EpidemicSimR packages used
     #'   to generate this object
     version = function(value){
       if(missing(value)){
         list(
           "AlphaSimR" = private$.version,
-          "EpiAlphaSimR" = private$.versionEpiAlphaSimR
+          "EpidemicSimR" = private$.versionEpidemicSimR
         )
       } else {
         stop("`$version` is read only", call. = F)

@@ -4,10 +4,10 @@
 #'
 #' @description
 #' Extends \code{\link[AlphaSimR]{setPheno}} for objects of class
-#' \code{\link{EPop-class}} to scale multiplicative traits in an epidemiological
+#' \code{\link{PopEpidemic-class}} to scale multiplicative traits in an epidemiological
 #' model such that they have an expected mean of 1 (if desired).
 #'
-#' @param pop an object of \code{\link{EPop-class}}
+#' @param pop an object of \code{\link{PopEpidemic-class}}
 #' @param h2 a vector of desired narrow-sense heritabilities for
 #' each trait. See details.
 #' @param H2 a vector of desired broad-sense heritabilities for
@@ -52,7 +52,7 @@
 #' @export
 setMethod(
   "setPheno",
-  signature(pop = "EPop"),
+  signature(pop = "PopEpidemic"),
   function(pop, h2 = NULL, H2 = NULL, varE = NULL, corE = NULL,
            reps = 1, fixEff = 1L, p = NULL, onlyPheno = FALSE,
            traits = NULL, simParam = NULL, stnd = NULL) {

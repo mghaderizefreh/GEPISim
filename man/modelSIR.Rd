@@ -8,12 +8,12 @@ modelSIR(epop, simParam = NULL)
 }
 \arguments{
 \item{epop}{A population with an epidemy, an object of class
-\code{\link{EPop-class}}}
+\code{\link{PopEpidemic-class}}}
 
-\item{simParam}{a \code{\link{SimParamEpidemy}} object}
+\item{simParam}{a \code{\link{SimParamEpidemic}} object}
 }
 \value{
-Returns the same input object of type \code{\link{EPop-class}} with
+Returns the same input object of type \code{\link{PopEpidemic-class}} with
  the \code{dynamic} field populated with evolution of the epidemy
 }
 \description{
