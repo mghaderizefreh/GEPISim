@@ -45,6 +45,39 @@ SimParamEpidemic <- R6Class(
     #' @field RP_scale This is not user defined but calculated as
     #'  ` RP_scale = removal_period / RP_shape `
     RP_scale = NA_real_,
+    
+    # detection_period field ----
+    #' @field detection_period the mean time an individual stays undetected in
+    #'   the "I" state before moving to the detected "D" state. Only consumed by
+    #'   models with a "D" compartment (e.g. SIDR).
+    detection_period = NA_real_,
+    
+    # DP_shape field ----
+    #' @field DP_shape shape of the gamma distribution for the detection period.
+    #'   A value of 1 gives an exponential distribution.
+    DP_shape = NA_real_,
+    
+    # DP_scale field ----
+    #' @field DP_scale not user defined but calculated as
+    #'  ` DP_scale = detection_period / DP_shape `
+    DP_scale = NA_real_,
+    
+    # latent_period field ----
+    #' @field latent_period the mean time an individual stays in the exposed
+    #'   "E" (latent, non-infectious) state before becoming infectious "I".
+    #'   Only consumed by models with an "E" compartment (e.g. SEIR).
+    latent_period = NA_real_,
+    
+    # LP_shape field ----
+    #' @field LP_shape shape of the gamma distribution for the latent period.
+    #'   A value of 1 gives an exponential distribution.
+    LP_shape = NA_real_,
+    
+    # LP_scale field ----
+    #' @field LP_scale not user defined but calculated as
+    #'  ` LP_scale = latent_period / LP_shape `
+    LP_scale = NA_real_,
+    
 
     # timings field ----
     #' @field timings list of strings
@@ -65,17 +98,29 @@ SimParamEpidemic <- R6Class(
     #' @param founderPop an object of
     #'   \code{\link[AlphaSimR:Pop-class]{MapPop-class}}
     #'
-    #' @param model see \code{\link[epiAlphSimR]{SimParamEpidemic}} field
+    #' @param model see \code{\link[EpidemicSimR]{SimParamEpidemic}} field
     #'   \code{model}
     #'
-    #' @param removal_period see \code{\link[epiAlphSimR]{SimParamEpidemic}}
+    #' @param removal_period see \code{\link[EpidemicSimR]{SimParamEpidemic}}
     #'   field \code{removal_period}
     #'
-    #' @param r_beta see \code{\link[epiAlphSimR]{SimParamEpidemic}} field
+    #' @param r_beta see \code{\link[EpidemicSimR]{SimParamEpidemic}} field
     #'   \code{r_beta}
     #'
-    #' @param RP_shape \code{\link[epiAlphSimR]{SimParamEpidemic}} field
+    #' @param RP_shape \code{\link[EpidemicSimR]{SimParamEpidemic}} field
     #'   \code{RP_shape}
+    #'   
+    #' @param detection_period \code{\link[EpidemicSimR]{SimParamEpidemic}}
+    #'   field \code{detection_period}
+    #'   
+    #' @param DP_shape \code{\link[EpidemicSimR]{SimParamEpidemic}} field 
+    #'   \code{DP_shape}
+    #'   
+    #' @param latent_period \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+    #'   \code{latent_period}
+    #' 
+    #' @param LP_shape \code{\link[EpidemicSimR]{SimParamEpidemic}} field 
+    #'   \code{LP_shape}
     #'
     #' @examples
     #' founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
@@ -88,11 +133,15 @@ SimParamEpidemic <- R6Class(
                           model = "SIR",
                           removal_period = 10,
                           r_beta = 0.5,
-                          RP_shape = 1){
-
+                          RP_shape = 1,
+                          detection_period = 10,
+                          DP_shape = 1,
+                          latent_period = 10,
+                          LP_shape = 1){
+      
       model <- toupper(model)
       stopifnot("provided model is not valid" = model %in% private$.validModels)
-
+      
       super$initialize(founderPop)
       private$.versionEpidemicSimR <- packageDescription("EpidemicSimR")$Version
       self$model <- model
@@ -100,10 +149,19 @@ SimParamEpidemic <- R6Class(
       self$r_beta <- r_beta
       self$RP_shape <- RP_shape
       self$RP_scale <- removal_period / RP_shape
-
-      # Get the appropriate names and headers for times
+      
+      # detection period (used by D-models such as SIDR)
+      self$detection_period <- detection_period
+      self$DP_shape <- DP_shape
+      self$DP_scale <- detection_period / DP_shape
+      
+      # latent period (used by E-models such as SEIR)
+      self$latent_period <- latent_period
+      self$LP_shape <- LP_shape
+      self$LP_scale <- latent_period / LP_shape
+      
       private$.GetTimingsAndTraitNames()
-
+      
       invisible(self)
     },
 
@@ -198,7 +256,8 @@ SimParamEpidemic <- R6Class(
     #### Private ----
     .versionEpidemicSimR = "character",
 
-    .validModels = c("SIR"),# c("SIR","SI","SIS","SEIR","SIDR","SEIDR")
+    .validModels = c("SIR", "SIDR", "SEIR", "SEIDR"),# c("SI","SIS")
+    
 
     .all_traits = c(s = "sus", i = "inf", l = "lat", d = "det",
                     t = "tol"),
