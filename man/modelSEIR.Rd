@@ -17,7 +17,6 @@ Returns the same input object of type \code{\link{PopEpidemic-class}}
  with the \code{dynamic} field populated with evolution of the epidemy
 }
 \description{
-Compartmental model SEIR - Susceptibility, Exposed (latent), Infectivity,
- Recoverability (or Removed). Exposed (E) individuals are infected but NOT
- yet infectious; only infectious (I) individuals can transmit.
+Compartmental model SEIR - Susceptible, Exposed, Infectious, Recovered
+ (or Removed).
 }

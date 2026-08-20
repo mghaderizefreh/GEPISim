@@ -15,8 +15,7 @@
   p = NULL,
   onlyPheno = FALSE,
   traits = NULL,
-  simParam = NULL,
-  stnd = NULL
+  simParam = NULL
 )
 }
 \arguments{

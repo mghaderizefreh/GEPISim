@@ -13,8 +13,8 @@ modelSIR(epop, simParam = NULL)
 \item{simParam}{a \code{\link{SimParamEpidemic}} object}
 }
 \value{
-Returns the same input object of type \code{\link{PopEpidemic-class}} with
- the \code{dynamic} field populated with evolution of the epidemy
+Returns the same input object of type \code{\link{PopEpidemic-class}}
+with the \code{dynamic} field populated with evolution of the epidemy
 }
 \description{
 Compartmental model SIR - Susceptibility, Infectivity, Recovrability

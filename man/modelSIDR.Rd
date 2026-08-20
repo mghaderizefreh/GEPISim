@@ -17,7 +17,6 @@ Returns the same input object of type \code{\link{PopEpidemic-class}}
  with the \code{dynamic} field populated with evolution of the epidemy
 }
 \description{
-Compartmental model SIDR - Susceptibility, Infectivity, Detectability,
- Recoverability (or Removed). Both the undetected (I) and detected (D)
- individuals are infectious.
+Compartmental model SIDR - Susceptible, Infectious, Detected, Recovered
+ (or Removed).
 }

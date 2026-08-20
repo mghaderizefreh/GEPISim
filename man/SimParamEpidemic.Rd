@@ -84,6 +84,9 @@ A value of 1 gives an exponential distribution.}
 \item{\code{LP_scale}}{not user defined but calculated as
 ` LP_scale = latent_period / LP_shape `}
 
+\item{\code{compartments}}{list of compartment (e.g., "S","I","R" for SIR)
+This is a list of one-letter characters determined by the model used}
+
 \item{\code{timings}}{list of strings
 This is a list of timings determined by the model used}
 

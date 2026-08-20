@@ -147,10 +147,9 @@ initDynamics <- function(ePop, simParam=NULL){
   # add timing columns
   ePop@dynamics[,(simParam$timings) := NA_real_]
   
-  compartments <- strsplit(simParam$model, split = "")[[1]] |> unique()
   # adding 'status' column as factor with levels of the model
   # add group_inf (infection force)
-  ePop@dynamics[, `:=`(status = factor("S", levels = compartments),
+  ePop@dynamics[, `:=`(status = factor("S", levels = simParam$compartments),
                        group_inf = 0.0)]
   
   # add columns generation (of infection) and infected_by

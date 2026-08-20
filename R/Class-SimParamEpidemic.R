@@ -79,6 +79,11 @@ SimParamEpidemic <- R6Class(
     LP_scale = NA_real_,
     
 
+    # compartment field ----
+    #' @field compartments list of compartment (e.g., "S","I","R" for SIR)
+    #' This is a list of one-letter characters determined by the model used
+    compartments = list(),
+    
     # timings field ----
     #' @field timings list of strings
     #' This is a list of timings determined by the model used
@@ -160,6 +165,8 @@ SimParamEpidemic <- R6Class(
       self$LP_shape <- LP_shape
       self$LP_scale <- latent_period / LP_shape
       
+      self$compartments <- strsplit(model, split = "")[[1]] |> unique() |> 
+        as.list()
       private$.GetTimingsAndTraitNames()
       
       invisible(self)
@@ -265,13 +272,13 @@ SimParamEpidemic <- R6Class(
       switch(toupper(self$model),
              "SEIDR" = {
                self$epi_traits <- private$.all_traits
-               self$timings <- c("Tinf", "Tinc", "Tsym", "Tdeath")
+               self$timings <- c("Tinf", "Tinc", "Tsign", "Tdeath")
              }, "SIDR" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "d", "t")]
-               self$timings <- c("Tinf", "Tsym", "Tdeath")
+               self$timings <- c("Tinf", "Tsign", "Tdeath")
              }, "SEIR" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "l", "t")]
-               self$timings <- c("Tinf", "Tsym", "Tdeath")
+               self$timings <- c("Tinf", "Tsign", "Tdeath")
              }, "SIR" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "t")]
                self$timings <- c("Tinf", "Tdeath")

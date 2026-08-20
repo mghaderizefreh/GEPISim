@@ -55,7 +55,7 @@ setMethod(
   signature(pop = "PopEpidemic"),
   function(pop, h2 = NULL, H2 = NULL, varE = NULL, corE = NULL,
            reps = 1, fixEff = 1L, p = NULL, onlyPheno = FALSE,
-           traits = NULL, simParam = NULL, stnd = NULL) {
+           traits = NULL, simParam = NULL) {
 
     # 1. Run the standard Pop phenotype calculation.
     pop <- callNextMethod(pop, h2, H2, varE, corE, reps, fixEff, p,
@@ -94,20 +94,6 @@ setMethod(
     # get half of the total phenotypic variance
     varP_half <- (varE + varG) / 2.
 
-    if (is.null(stnd)){
-      pop@pheno <- exp(pop@pheno)
-    }
-    if (stnd == 'shift'){
-      #shift all the phenotypes and then exponentiate
-      shift <- sweep(pop@pheno, 2, varP_half)
-      pop@pheno <- exp(shift)
-    } else if (stnd == 'divide'){
-      # exponentiate then
-      popexp <- exp(pop@pheno)
-      pop@pheno <- sweep(popexp, 2, colMeans(popexp), `/`)
-    }
-    else{
-      pop@pheno <- exp(pop@pheno)
-    }
+    pop@pheno <- exp(pop@pheno)
     return(pop)
   })
