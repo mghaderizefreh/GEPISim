@@ -4,8 +4,8 @@
 \alias{SimParamEpidemic}
 \title{Epidemic simulation parameter}
 \description{
-container for global epidemy simulation parameter. The users
-of this object assume it is stored in evironment as "SP", if this object
+container for global epidemic simulation parameter. The users
+of this object assume it is stored in environment as "SP", if this object
 is not explicitly passed. This is the practice in AlphaSimR and SimPlyBee
 }
 \details{
@@ -17,7 +17,7 @@ This documentation shows details specific to \code{SimParamEpidemic}.
 \examples{
 
 ## ------------------------------------------------
-## Method `SimParamEpidemic$new`
+## Method `SimParamEpidemic$new()`
 ## ------------------------------------------------
 
 founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
@@ -28,7 +28,7 @@ SP <- SimParamEpidemic$new(founderGenomes) # default model is "SIR"
 try(SP <- SimParamEpidemic$new(founderGenomes, model = "ABC"))
 
 ## ------------------------------------------------
-## Method `SimParamEpidemic$addTraitA`
+## Method `SimParamEpidemic$addTraitA()`
 ## ------------------------------------------------
 
 #Create founder haplotypes
@@ -44,121 +44,120 @@ SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
 \code{\link[AlphaSimR:SimParam]{AlphaSimR::SimParam}} -> \code{SimParamEpidemic}
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{model}}{the epidemiological model. The model can only be one of the
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{model}}{the epidemiological model. The model can only be one of the
 following and is case-insensitive
 SIR,}
 
-\item{\code{removal_period}}{the mean time an individual remains in the "I" or
+    \item{\code{removal_period}}{the mean time an individual remains in the "I" or
 infectious state before they are removed.}
 
-\item{\code{r_beta}}{mean transmission rate}
+    \item{\code{r_beta}}{mean transmission rate}
 
-\item{\code{RP_shape}}{This is the shape of the gamma distribution for survival. A value of 1
+    \item{\code{RP_shape}}{This is the shape of the gamma distribution for survival. A value of 1
 gives an exponential distribution. When RP_shape > 1, it indicates that
 hazard generally increases with time (removal becomes more likely the
 longer infection lasts). This is common for many disease processes where
 risk of recovery/death rises after some days.}
 
-\item{\code{RP_scale}}{This is not user defined but calculated as
+    \item{\code{RP_scale}}{This is not user defined but calculated as
 ` RP_scale = removal_period / RP_shape `}
 
-\item{\code{detection_period}}{the mean time an individual stays undetected in
+    \item{\code{detection_period}}{the mean time an individual stays undetected in
 the "I" state before moving to the detected "D" state. Only consumed by
 models with a "D" compartment (e.g. SIDR).}
 
-\item{\code{DP_shape}}{shape of the gamma distribution for the detection period.
+    \item{\code{DP_shape}}{shape of the gamma distribution for the detection period.
 A value of 1 gives an exponential distribution.}
 
-\item{\code{DP_scale}}{not user defined but calculated as
+    \item{\code{DP_scale}}{not user defined but calculated as
 ` DP_scale = detection_period / DP_shape `}
 
-\item{\code{latent_period}}{the mean time an individual stays in the exposed
+    \item{\code{latent_period}}{the mean time an individual stays in the exposed
 "E" (latent, non-infectious) state before becoming infectious "I".
 Only consumed by models with an "E" compartment (e.g. SEIR).}
 
-\item{\code{LP_shape}}{shape of the gamma distribution for the latent period.
+    \item{\code{LP_shape}}{shape of the gamma distribution for the latent period.
 A value of 1 gives an exponential distribution.}
 
-\item{\code{LP_scale}}{not user defined but calculated as
+    \item{\code{LP_scale}}{not user defined but calculated as
 ` LP_scale = latent_period / LP_shape `}
 
-\item{\code{compartments}}{list of compartment (e.g., "S","I","R" for SIR)
+    \item{\code{compartments}}{list of compartment (e.g., "S","I","R" for SIR)
 This is a list of one-letter characters determined by the model used}
 
-\item{\code{timings}}{list of strings
+    \item{\code{timings}}{list of strings
 This is a list of timings determined by the model used}
 
-\item{\code{epi_traits}}{list of strings
+    \item{\code{epi_traits}}{list of strings
 This is a list of traits to be used in trait definition. Not defined by
 the user}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{version}}{list, versions of AlphaSimR and EpidemicSimR packages used
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{version}}{list, versions of AlphaSimR and GEPISim packages used
 to generate this object}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-SimParamEpidemic-new}{\code{SimParamEpidemic$new()}}
-\item \href{#method-SimParamEpidemic-addTraitA}{\code{SimParamEpidemic$addTraitA()}}
-\item \href{#method-SimParamEpidemic-clone}{\code{SimParamEpidemic$clone()}}
+  \itemize{
+    \item \href{#method-SimParamEpidemic-initialize}{\code{SimParamEpidemic$new()}}
+    \item \href{#method-SimParamEpidemic-addTraitA}{\code{SimParamEpidemic$addTraitA()}}
+    \item \href{#method-SimParamEpidemic-clone}{\code{SimParamEpidemic$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addSnpChip"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addSnpChip'><code>AlphaSimR::SimParam$addSnpChip()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addSnpChipByName"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addSnpChipByName'><code>AlphaSimR::SimParam$addSnpChipByName()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addStructuredSnpChip"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addStructuredSnpChip'><code>AlphaSimR::SimParam$addStructuredSnpChip()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addToPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addToPed'><code>AlphaSimR::SimParam$addToPed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addToRec"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addToRec'><code>AlphaSimR::SimParam$addToRec()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAD"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAD'><code>AlphaSimR::SimParam$addTraitAD()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADE'><code>AlphaSimR::SimParam$addTraitADE()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADEG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADEG'><code>AlphaSimR::SimParam$addTraitADEG()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADG'><code>AlphaSimR::SimParam$addTraitADG()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAE'><code>AlphaSimR::SimParam$addTraitAE()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAEG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAEG'><code>AlphaSimR::SimParam$addTraitAEG()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAG'><code>AlphaSimR::SimParam$addTraitAG()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="altAddTraitAD"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-altAddTraitAD'><code>AlphaSimR::SimParam$altAddTraitAD()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="ibdHaplo"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-ibdHaplo'><code>AlphaSimR::SimParam$ibdHaplo()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="importTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-importTrait'><code>AlphaSimR::SimParam$importTrait()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="manAddTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-manAddTrait'><code>AlphaSimR::SimParam$manAddTrait()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="removeTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-removeTrait'><code>AlphaSimR::SimParam$removeTrait()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="rescaleTraits"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-rescaleTraits'><code>AlphaSimR::SimParam$rescaleTraits()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="resetPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-resetPed'><code>AlphaSimR::SimParam$resetPed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="restrSegSites"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-restrSegSites'><code>AlphaSimR::SimParam$restrSegSites()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setCorE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setCorE'><code>AlphaSimR::SimParam$setCorE()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setFounderHap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setFounderHap'><code>AlphaSimR::SimParam$setFounderHap()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setRecombRatio"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setRecombRatio'><code>AlphaSimR::SimParam$setRecombRatio()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setSexes"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setSexes'><code>AlphaSimR::SimParam$setSexes()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setTrackPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setTrackPed'><code>AlphaSimR::SimParam$setTrackPed()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setTrackRec"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setTrackRec'><code>AlphaSimR::SimParam$setTrackRec()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setVarE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setVarE'><code>AlphaSimR::SimParam$setVarE()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchFemaleMap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchFemaleMap'><code>AlphaSimR::SimParam$switchFemaleMap()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchGenMap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchGenMap'><code>AlphaSimR::SimParam$switchGenMap()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchMaleMap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchMaleMap'><code>AlphaSimR::SimParam$switchMaleMap()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchTrait'><code>AlphaSimR::SimParam$switchTrait()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="updateLastId"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-updateLastId'><code>AlphaSimR::SimParam$updateLastId()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addSnpChip"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addSnpChip'><code>AlphaSimR::SimParam$addSnpChip()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addSnpChipByName"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addSnpChipByName'><code>AlphaSimR::SimParam$addSnpChipByName()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addStructuredSnpChip"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addStructuredSnpChip'><code>AlphaSimR::SimParam$addStructuredSnpChip()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addToPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addToPed'><code>AlphaSimR::SimParam$addToPed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addToRec"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addToRec'><code>AlphaSimR::SimParam$addToRec()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAD"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAD'><code>AlphaSimR::SimParam$addTraitAD()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADE'><code>AlphaSimR::SimParam$addTraitADE()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADEG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADEG'><code>AlphaSimR::SimParam$addTraitADEG()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADG'><code>AlphaSimR::SimParam$addTraitADG()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAE'><code>AlphaSimR::SimParam$addTraitAE()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAEG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAEG'><code>AlphaSimR::SimParam$addTraitAEG()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAG'><code>AlphaSimR::SimParam$addTraitAG()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="altAddTraitAD"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-altAddTraitAD'><code>AlphaSimR::SimParam$altAddTraitAD()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="ibdHaplo"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-ibdHaplo'><code>AlphaSimR::SimParam$ibdHaplo()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="importTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-importTrait'><code>AlphaSimR::SimParam$importTrait()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="manAddTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-manAddTrait'><code>AlphaSimR::SimParam$manAddTrait()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="removeTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-removeTrait'><code>AlphaSimR::SimParam$removeTrait()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="rescaleTraits"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-rescaleTraits'><code>AlphaSimR::SimParam$rescaleTraits()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="resetPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-resetPed'><code>AlphaSimR::SimParam$resetPed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="restrSegSites"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-restrSegSites'><code>AlphaSimR::SimParam$restrSegSites()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setCorE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setCorE'><code>AlphaSimR::SimParam$setCorE()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setFounderHap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setFounderHap'><code>AlphaSimR::SimParam$setFounderHap()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setRecombRatio"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setRecombRatio'><code>AlphaSimR::SimParam$setRecombRatio()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setSexes"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setSexes'><code>AlphaSimR::SimParam$setSexes()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setTrackPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setTrackPed'><code>AlphaSimR::SimParam$setTrackPed()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setTrackRec"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setTrackRec'><code>AlphaSimR::SimParam$setTrackRec()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="setVarE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-setVarE'><code>AlphaSimR::SimParam$setVarE()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchFemaleMap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchFemaleMap'><code>AlphaSimR::SimParam$switchFemaleMap()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchGenMap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchGenMap'><code>AlphaSimR::SimParam$switchGenMap()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchMaleMap"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchMaleMap'><code>AlphaSimR::SimParam$switchMaleMap()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="switchTrait"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-switchTrait'><code>AlphaSimR::SimParam$switchTrait()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="updateLastId"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-updateLastId'><code>AlphaSimR::SimParam$updateLastId()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SimParamEpidemic-new"></a>}}
-\if{latex}{\out{\hypertarget{method-SimParamEpidemic-new}{}}}
-\subsection{Method \code{new()}}{
-Starts the process of building a new simulation by creating
+\if{html}{\out{<a id="method-SimParamEpidemic-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-SimParamEpidemic-initialize}{}}}
+\subsection{\code{SimParamEpidemic$new()}}{
+  Starts the process of building a new simulation by creating
   a new SimParamEpidemic object and assigning a founder population of
   genomes to this object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SimParamEpidemic$new(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SimParamEpidemic$new(
   founderPop,
   model = "SIR",
   removal_period = 10,
@@ -168,68 +167,59 @@ Starts the process of building a new simulation by creating
   DP_shape = 1,
   latent_period = 10,
   LP_shape = 1
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{founderPop}}{an object of
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{founderPop}}{an object of
 \code{\link[AlphaSimR:Pop-class]{MapPop-class}}}
-
-\item{\code{model}}{see \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+      \item{\code{model}}{see \code{\link[GEPISim]{SimParamEpidemic}} field
 \code{model}}
-
-\item{\code{removal_period}}{see \code{\link[EpidemicSimR]{SimParamEpidemic}}
+      \item{\code{removal_period}}{see \code{\link[GEPISim]{SimParamEpidemic}}
 field \code{removal_period}}
-
-\item{\code{r_beta}}{see \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+      \item{\code{r_beta}}{see \code{\link[GEPISim]{SimParamEpidemic}} field
 \code{r_beta}}
-
-\item{\code{RP_shape}}{\code{\link[EpidemicSimR]{SimParamEpidemic}} field
+      \item{\code{RP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{RP_shape}}
-
-\item{\code{detection_period}}{\code{\link[EpidemicSimR]{SimParamEpidemic}}
-field \code{detection_period}}
-
-\item{\code{DP_shape}}{\code{\link[EpidemicSimR]{SimParamEpidemic}} field 
+      \item{\code{detection_period}}{\code{\link[GEPISim]{SimParamEpidemic}} field
+\code{detection_period}}
+      \item{\code{DP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{DP_shape}}
-
-\item{\code{latent_period}}{\code{\link[EpidemicSimR]{SimParamEpidemic}} field
+      \item{\code{latent_period}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{latent_period}}
-
-\item{\code{LP_shape}}{\code{\link[EpidemicSimR]{SimParamEpidemic}} field 
+      \item{\code{LP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{LP_shape}}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
 SP <- SimParamEpidemic$new(founderGenomes) # default model is "SIR"
-\dontshow{SP$nThreads = 1L}
 
 # there are only a few models to select from
 try(SP <- SimParamEpidemic$new(founderGenomes, model = "ABC"))
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SimParamEpidemic-addTraitA"></a>}}
 \if{latex}{\out{\hypertarget{method-SimParamEpidemic-addTraitA}{}}}
-\subsection{Method \code{addTraitA()}}{
-Randomly assigns eligible QTLs for one or more additive traits.
+\subsection{\code{SimParamEpidemic$addTraitA()}}{
+  Randomly assigns eligible QTLs for one or more additive traits.
 If simulating more than one trait, all traits will be pleiotropic
 with correlated additive effects. This is a wrapper around the function
 \code{\link[AlphaSimR]{SimParam}} method \code{addTraitsA} except the
 mean is forced to be zero and names are automatically inferred from the
 field \code{epi_traits} of the object
-\code{\link[EpidemicSimR]{SimParamEpidemic}}
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SimParamEpidemic$addTraitA(
+\code{\link[GEPISim]{SimParamEpidemic}}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SimParamEpidemic$addTraitA(
   nQtlPerChr,
   mean = 0,
   var = 1,
@@ -239,77 +229,68 @@ field \code{epi_traits} of the object
   force = FALSE,
   name = NULL,
   nThreads = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{nQtlPerChr}}{number of QTLs per chromosome. Can be a single value or
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{nQtlPerChr}}{number of QTLs per chromosome. Can be a single value or
 nChr values.}
-
-\item{\code{mean}}{a vector of mean genetic values for the traits. These will be
+      \item{\code{mean}}{a vector of mean genetic values for the traits. These will be
 ignored as they are forced to be zero.}
-
-\item{\code{var}}{a vector of desired genetic variances for the traits. If a
+      \item{\code{var}}{a vector of desired genetic variances for the traits. If a
 scalar is provided it will be recycled to provide a variance vector of
 length(name)}
-
-\item{\code{corA}}{a matrix of correlations between additive effects. If NULL is
+      \item{\code{corA}}{a matrix of correlations between additive effects. If NULL is
 passed, it will replaced by the identity matrix}
-
-\item{\code{gamma}}{should a gamma distribution be used instead of normal. This
-is not recommended for \code{\link[EpidemicSimR]{SimParamEpidemic}}}
-
-\item{\code{shape}}{the shape parameter for the gamma distribution
+      \item{\code{gamma}}{should a gamma distribution be used instead of normal. This
+is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}}
+      \item{\code{shape}}{the shape parameter for the gamma distribution
 (the rate/scale parameter of the gamma distribution is accounted
 for via the desired level of genetic variance, the var argument). This
-is not recommended for \code{\link[EpidemicSimR]{SimParamEpidemic}}}
-
-\item{\code{force}}{should the check for a running simulation be
+is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}}
+      \item{\code{force}}{should the check for a running simulation be
 ignored. Only set to TRUE if you know what you are doing.}
-
-\item{\code{name}}{Name of the epidemiological traits. if NULL is passed, then
+      \item{\code{name}}{Name of the epidemiological traits. if NULL is passed, then
 the names will be inferred from the model name, otherwise they should
 match the field \code{epi_traits} of the object
-\code{\link[EpidemicSimR]{SimParamEpidemic}}}
-
-\item{\code{nThreads}}{number of threads to use if OpenMP is available.
+\code{\link[GEPISim]{SimParamEpidemic}}}
+      \item{\code{nThreads}}{number of threads to use if OpenMP is available.
 If \code{NULL}, the number is obtained from \code{self$nThreads}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{#Create founder haplotypes
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{#Create founder haplotypes
 founderPop = quickHaplo(nInd=10, nChr=1, segSites=10)
 
 #Set simulation parameters
 SP1 = SimParamEpidemic$new(founderPop, "SIR")
 SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
-
-
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-SimParamEpidemic-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-SimParamEpidemic-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{SimParamEpidemic$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{SimParamEpidemic$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{SimParamEpidemic$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

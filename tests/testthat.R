@@ -1,4 +1,4 @@
 library(testthat)
-library(EpidemicSimR)
+library(GEPISim)
 
-test_check("EpidemicSimR")
+test_check("GEPISim")

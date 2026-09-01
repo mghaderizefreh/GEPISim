@@ -1,7 +1,7 @@
 library(testthat)
 library(AlphaSimR)
 
-# tests from AlphaSimR applied to EpidemicSimR ----
+# tests from AlphaSimR applied to GEPISim ----
 test_that("SimParamEpidemic nThreads validates values and NULL resets to default", {
   founder <- quickHaplo(nInd = 2, nChr = 2, segSites = 4)
   SP <- SimParamEpidemic$new(founder)
@@ -32,7 +32,7 @@ test_that("SimParamEpidemic nThreads validates values and NULL resets to default
   )
 })
 
-#### new tests for EpidemicSimR ----
+#### new tests for GEPISim ----
 make_founders <- function() {
   # Small/fast founder genomes for tests
   AlphaSimR::quickHaplo(nInd = 4, nChr = 1, segSites = 10)
@@ -116,11 +116,11 @@ test_that("active binding 'version' returns expected structure and values", {
 
   v <- sp$version
   expect_type(v, "list")
-  expect_true(all(c("AlphaSimR", "EpidemicSimR") %in% names(v)))
+  expect_true(all(c("AlphaSimR", "GEPISim") %in% names(v)))
 
-  # EpidemicSimR version should match installed package version
+  # GEPISim version should match installed package version
   expect_identical(
-    v$EpidemicSimR,
-    utils::packageDescription("EpidemicSimR")$Version
+    v$GEPISim,
+    utils::packageDescription("GEPISim")$Version
   )
 })

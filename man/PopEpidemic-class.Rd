@@ -12,7 +12,7 @@
 
 initDynamics(ePop, simParam = NULL)
 
-asPopEpidemic(from, group_list = NULL, donor_list = NULL, simParam = NULL)
+asPopEpidemic(from, group_list = NULL, indCases = NULL, simParam = NULL)
 }
 \arguments{
 \item{ePop}{an \code{\link{PopEpidemic-class}} object}
@@ -24,12 +24,12 @@ asPopEpidemic(from, group_list = NULL, donor_list = NULL, simParam = NULL)
 \item{group_list}{list of groups for the population. Each group is a separate
 epidemy. If NULL it is assumed there is only one group}
 
-\item{donor_list}{list of 0s and 1s indicating susceptible and donor 
-individuals, respectively. If any other number is passed this will cause an
-error. If NULL, it is assumed there is one donor per group.}
+\item{indCases}{list of 0s and 1s indicating susceptible and index cases,
+respectively. If any other number is passed this will cause an error. If
+NULL, it is assumed there is one index case per group.}
 }
 \value{
-the same input object ePop with the field `dynamics` initialised.
+the same input object `ePop` with the field `dynamics` initialised.
 }
 \description{
 A population with an epidemy. Extends \code{\link[AlphaSimR:Pop-class]{Pop}}
@@ -40,11 +40,11 @@ the methods.
 The dynamics field is data.table with several columns,
 - Timing columns: these depend on the model used. They are supposed to be
   stored in the simParam and will be extracted from it
-- status: these also depend on the model used. In general they are the 
+- status: these also depend on the model used. In general they are the
   letters that define the model, e.g., SIR will have states S, I, and R
 - generation: Which type of infection is it, i.e., primary, secondary, etc.
-  Initially set to 1 for all donors
-- infected_by: the index of the individual that infects a given individual 
+  Initially set to 1 for all index cases
+- infected_by: the index of the individual that infects a given individual
 - group_inf: group infectivity level
 }
 \section{Functions}{

@@ -2,6 +2,7 @@
 
 export(SimParamEpidemic)
 export(asPopEpidemic)
+export(get_R0)
 export(initDynamics)
 export(newPopEpidemic)
 export(run)

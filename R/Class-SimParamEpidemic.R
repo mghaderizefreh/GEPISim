@@ -1,8 +1,8 @@
 #' @rdname SimParamEpidemic
 #' @title Epidemic simulation parameter
 #'
-#' @description container for global epidemy simulation parameter. The users
-#' of this object assume it is stored in evironment as "SP", if this object
+#' @description container for global epidemic simulation parameter. The users
+#' of this object assume it is stored in environment as "SP", if this object
 #' is not explicitly passed. This is the practice in AlphaSimR and SimPlyBee
 #'
 #' @details This documentation shows details specific to \code{SimParamEpidemic}.
@@ -11,7 +11,7 @@
 #'   each \code{SimParamEpidemic} function.
 #'
 #' @export
-SimParamEpidemic <- R6Class(
+SimParamEpidemic <- R6::R6Class(
   classname = "SimParamEpidemic",
   inherit = SimParam,
 
@@ -45,45 +45,45 @@ SimParamEpidemic <- R6Class(
     #' @field RP_scale This is not user defined but calculated as
     #'  ` RP_scale = removal_period / RP_shape `
     RP_scale = NA_real_,
-    
+
     # detection_period field ----
     #' @field detection_period the mean time an individual stays undetected in
     #'   the "I" state before moving to the detected "D" state. Only consumed by
     #'   models with a "D" compartment (e.g. SIDR).
     detection_period = NA_real_,
-    
+
     # DP_shape field ----
     #' @field DP_shape shape of the gamma distribution for the detection period.
     #'   A value of 1 gives an exponential distribution.
     DP_shape = NA_real_,
-    
+
     # DP_scale field ----
     #' @field DP_scale not user defined but calculated as
     #'  ` DP_scale = detection_period / DP_shape `
     DP_scale = NA_real_,
-    
+
     # latent_period field ----
     #' @field latent_period the mean time an individual stays in the exposed
     #'   "E" (latent, non-infectious) state before becoming infectious "I".
     #'   Only consumed by models with an "E" compartment (e.g. SEIR).
     latent_period = NA_real_,
-    
+
     # LP_shape field ----
     #' @field LP_shape shape of the gamma distribution for the latent period.
     #'   A value of 1 gives an exponential distribution.
     LP_shape = NA_real_,
-    
+
     # LP_scale field ----
     #' @field LP_scale not user defined but calculated as
     #'  ` LP_scale = latent_period / LP_shape `
     LP_scale = NA_real_,
-    
+
 
     # compartment field ----
     #' @field compartments list of compartment (e.g., "S","I","R" for SIR)
     #' This is a list of one-letter characters determined by the model used
     compartments = list(),
-    
+
     # timings field ----
     #' @field timings list of strings
     #' This is a list of timings determined by the model used
@@ -103,28 +103,28 @@ SimParamEpidemic <- R6Class(
     #' @param founderPop an object of
     #'   \code{\link[AlphaSimR:Pop-class]{MapPop-class}}
     #'
-    #' @param model see \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+    #' @param model see \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{model}
     #'
-    #' @param removal_period see \code{\link[EpidemicSimR]{SimParamEpidemic}}
+    #' @param removal_period see \code{\link[GEPISim]{SimParamEpidemic}}
     #'   field \code{removal_period}
     #'
-    #' @param r_beta see \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+    #' @param r_beta see \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{r_beta}
     #'
-    #' @param RP_shape \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+    #' @param RP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{RP_shape}
-    #'   
-    #' @param detection_period \code{\link[EpidemicSimR]{SimParamEpidemic}}
-    #'   field \code{detection_period}
-    #'   
-    #' @param DP_shape \code{\link[EpidemicSimR]{SimParamEpidemic}} field 
+    #'
+    #' @param detection_period \code{\link[GEPISim]{SimParamEpidemic}} field
+    #'   \code{detection_period}
+    #'
+    #' @param DP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{DP_shape}
-    #'   
-    #' @param latent_period \code{\link[EpidemicSimR]{SimParamEpidemic}} field
+    #'
+    #' @param latent_period \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{latent_period}
-    #' 
-    #' @param LP_shape \code{\link[EpidemicSimR]{SimParamEpidemic}} field 
+    #'
+    #' @param LP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{LP_shape}
     #'
     #' @examples
@@ -143,32 +143,32 @@ SimParamEpidemic <- R6Class(
                           DP_shape = 1,
                           latent_period = 10,
                           LP_shape = 1){
-      
+
       model <- toupper(model)
       stopifnot("provided model is not valid" = model %in% private$.validModels)
-      
+
       super$initialize(founderPop)
-      private$.versionEpidemicSimR <- packageDescription("EpidemicSimR")$Version
+      private$.versionGEPISim <- packageDescription("GEPISim")$Version
       self$model <- model
       self$removal_period = removal_period
       self$r_beta <- r_beta
       self$RP_shape <- RP_shape
       self$RP_scale <- removal_period / RP_shape
-      
+
       # detection period (used by D-models such as SIDR)
       self$detection_period <- detection_period
       self$DP_shape <- DP_shape
       self$DP_scale <- detection_period / DP_shape
-      
+
       # latent period (used by E-models such as SEIR)
       self$latent_period <- latent_period
       self$LP_shape <- LP_shape
       self$LP_scale <- latent_period / LP_shape
-      
-      self$compartments <- strsplit(model, split = "")[[1]] |> unique() |> 
+
+      self$compartments <- strsplit(model, split = "")[[1]] |> unique() |>
         as.list()
       private$.GetTimingsAndTraitNames()
-      
+
       invisible(self)
     },
 
@@ -181,7 +181,7 @@ SimParamEpidemic <- R6Class(
     #' \code{\link[AlphaSimR]{SimParam}} method \code{addTraitsA} except the
     #' mean is forced to be zero and names are automatically inferred from the
     #' field \code{epi_traits} of the object
-    #' \code{\link[EpidemicSimR]{SimParamEpidemic}}
+    #' \code{\link[GEPISim]{SimParamEpidemic}}
     #'
     #' @param nQtlPerChr number of QTLs per chromosome. Can be a single value or
     #'   nChr values.
@@ -193,17 +193,17 @@ SimParamEpidemic <- R6Class(
     #' @param corA a matrix of correlations between additive effects. If NULL is
     #'   passed, it will replaced by the identity matrix
     #' @param gamma should a gamma distribution be used instead of normal. This
-    #'   is not recommended for \code{\link[EpidemicSimR]{SimParamEpidemic}}
+    #'   is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}
     #' @param shape the shape parameter for the gamma distribution
     #'   (the rate/scale parameter of the gamma distribution is accounted
     #'   for via the desired level of genetic variance, the var argument). This
-    #'   is not recommended for \code{\link[EpidemicSimR]{SimParamEpidemic}}
+    #'   is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}
     #' @param force should the check for a running simulation be
     #' ignored. Only set to TRUE if you know what you are doing.
     #' @param name Name of the epidemiological traits. if NULL is passed, then
     #'   the names will be inferred from the model name, otherwise they should
     #'   match the field \code{epi_traits} of the object
-    #'   \code{\link[EpidemicSimR]{SimParamEpidemic}}
+    #'   \code{\link[GEPISim]{SimParamEpidemic}}
     #' @param nThreads number of threads to use if OpenMP is available.
     #' If \code{NULL}, the number is obtained from \code{self$nThreads}.
     #'
@@ -261,10 +261,10 @@ SimParamEpidemic <- R6Class(
   ),
   private = list(
     #### Private ----
-    .versionEpidemicSimR = "character",
+    .versionGEPISim = "character",
 
     .validModels = c("SIR", "SIDR", "SEIR", "SEIDR"),# c("SI","SIS")
-    
+
 
     .all_traits = c(s = "sus", i = "inf", l = "lat", d = "det",
                     t = "tol"),
@@ -297,13 +297,13 @@ SimParamEpidemic <- R6Class(
   ),
 
   active = list(
-    #' @field version list, versions of AlphaSimR and EpidemicSimR packages used
+    #' @field version list, versions of AlphaSimR and GEPISim packages used
     #'   to generate this object
     version = function(value){
       if(missing(value)){
         list(
           "AlphaSimR" = private$.version,
-          "EpidemicSimR" = private$.versionEpidemicSimR
+          "GEPISim" = private$.versionGEPISim
         )
       } else {
         stop("`$version` is read only", call. = F)

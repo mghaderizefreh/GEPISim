@@ -1,10 +1,10 @@
 # fmt: skip file
 
-#' EpidemicSimR: AlphaSimR extension for epidemies
+#' GEPISim: AlphaSimR extension for epidemics
 #'
 #' Currently in development
 #'
 #' @import data.table
 #' @import AlphaSimR
-#' @name EpidemicSimR
+#' @name GEPISim
 "_PACKAGE"

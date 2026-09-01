@@ -19,7 +19,7 @@ test_that("newPopEpidemic basic construction and defaults work", {
   # Dynamics data.table structure
   expect_true(data.table::is.data.table(ep@dynamics))
   # Required columns present (order not enforced)
-  expect_true(all(c("donor", "group", "status", "group_inf",
+  expect_true(all(c("indCases", "group", "status", "group_inf",
                     "generation", "infected_by") %in% names(ep@dynamics)))
 
   # Timings columns present and NA_real_
@@ -32,15 +32,15 @@ test_that("newPopEpidemic basic construction and defaults work", {
     }
   }
 
-  # Defaults for grouping/donors
+  # Defaults for grouping/indCases
   expect_all_equal(ep@dynamics$group, 1L)
-  expect_equal(sum(ep@dynamics$donor == 1), 1L)
+  expect_equal(sum(ep@dynamics$indCases == 1), 1L)
 
   # Status factor levels and initial value
   expect_identical(levels(ep@dynamics$status), unique(strsplit("SIR", "")[[1]]))
 
-  # TODO: This actually should not be true as the donor is not susceptible but
-  #       may depend on the model if the model is infectious only or also
+  # TODO: This actually should not be true as the indCases is not susceptible
+  #       but may depend on the model if the model is infectious only or also
   #       diseased as well. Need to confirm with Jamie or see his code
   #  expect_true(all(as.character(ep@dynamics$status) == "S"))
 
@@ -48,40 +48,40 @@ test_that("newPopEpidemic basic construction and defaults work", {
   expect_true(all(ep@dynamics$group_inf == 0))
 
   # generation and infected_by values
-  donors_idx <- which(ep@dynamics$donor == 1)
-  nondonors_idx <- which(ep@dynamics$donor == 0)
-  expect_true(all(ep@dynamics$generation[donors_idx] == 1L))
-  expect_true(all(ep@dynamics$infected_by[donors_idx] == 0L))
-  expect_true(all(is.na(ep@dynamics$generation[nondonors_idx])))
-  expect_true(all(is.na(ep@dynamics$infected_by[nondonors_idx])))
+  indCases <- which(ep@dynamics$indCases == 1)
+  control_idx <- which(ep@dynamics$indCases == 0)
+  expect_true(all(ep@dynamics$generation[indCases] == 1L))
+  expect_true(all(ep@dynamics$infected_by[indCases] == 0L))
+  expect_true(all(is.na(ep@dynamics$generation[control_idx])))
+  expect_true(all(is.na(ep@dynamics$infected_by[control_idx])))
 })
 
-test_that("newPopEpidemic honors provided group_list and donor_list", {
+test_that("newPopEpidemic honors provided group_list and indCases", {
 
   founderPop <- AlphaSimR::quickHaplo(nInd = 5, nChr = 1, segSites = 50)
   SP <- SimParamEpidemic$new(founderPop, model = "SIR")
   SP$addTraitA(nQtlPerChr = 5)
 
   group_list <- c(1, 1, 2, 2, 2)
-  donor_list <- c(1, 0, 0, 1, 0)
+  indCases <- c(1, 0, 0, 1, 0)
 
   ep <- newPopEpidemic(founderPop, group_list = group_list,
-                   donor_list = donor_list, simParam = SP)
+                       indCases = indCases, simParam = SP)
 
   expect_identical(as.integer(ep@dynamics$group), as.integer(group_list))
-  expect_identical(as.integer(ep@dynamics$donor), as.integer(donor_list))
+  expect_identical(as.integer(ep@dynamics$indCases), as.integer(indCases))
 
-  # One donor per group
-  expect_equal(sum(ep@dynamics$donor[ep@dynamics$group == 1] == 1), 1L)
-  expect_equal(sum(ep@dynamics$donor[ep@dynamics$group == 2] == 1), 1L)
+  # One index per group
+  expect_equal(sum(ep@dynamics$indCases[ep@dynamics$group == 1] == 1), 1L)
+  expect_equal(sum(ep@dynamics$indCases[ep@dynamics$group == 2] == 1), 1L)
 
-  # generation/infected_by at donors vs non-donors
-  donors_idx <- which(ep@dynamics$donor == 1)
-  nondonors_idx <- which(ep@dynamics$donor == 0)
-  expect_true(all(ep@dynamics$generation[donors_idx] == 1L))
-  expect_true(all(ep@dynamics$infected_by[donors_idx] == 0L))
-  expect_true(all(is.na(ep@dynamics$generation[nondonors_idx])))
-  expect_true(all(is.na(ep@dynamics$infected_by[nondonors_idx])))
+  # generation/infected_by at index vs control
+  indCases <- which(ep@dynamics$indCases == 1)
+  controlCases <- which(ep@dynamics$indCases == 0)
+  expect_true(all(ep@dynamics$generation[indCases] == 1L))
+  expect_true(all(ep@dynamics$infected_by[indCases] == 0L))
+  expect_true(all(is.na(ep@dynamics$generation[controlCases])))
+  expect_true(all(is.na(ep@dynamics$infected_by[controlCases])))
 })
 
 test_that("newPopEpidemic error handling works", {
@@ -99,26 +99,26 @@ test_that("newPopEpidemic error handling works", {
   expect_error(newPopEpidemic(founderPop, group_list = rep(1L, 4), simParam = SP),
                "group_list must have equal elements")
 
-  # donor_list length mismatch
+  # indCases length mismatch
   expect_error(newPopEpidemic(founderPop,
                           group_list = rep(1L, 5),
-                          donor_list = c(1, 0, 0, 0),
+                          indCases = c(1, 0, 0, 0),
                           simParam = SP),
-               "donor_list must have the same length")
+               "indCases must have the same length")
 
-  # donor_list invalid values
+  # indCases invalid values
   expect_error(newPopEpidemic(founderPop,
                           group_list = rep(1L, 5),
-                          donor_list = c(1, 0, 0, 2, 0),
+                          indCases = c(1, 0, 0, 2, 0),
                           simParam = SP),
-               "donor_list must contain only 0 and 1 values")
+               "indCases must contain only 0 and 1 values")
 
-  # must have at least one donor per group
+  # must have at least one index per group
   expect_error(newPopEpidemic(founderPop,
                           group_list = c(1, 1, 2, 2, 2),
-                          donor_list = c(1, 0, 0, 0, 0),
+                          indCases = c(1, 0, 0, 0, 0),
                           simParam = SP),
-               "Each group must have at least one donor")
+               "Each group must have at least one case")
 })
 
 test_that("show(PopEpidemic) prints expected summary", {

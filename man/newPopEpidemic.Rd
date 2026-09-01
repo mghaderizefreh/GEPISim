@@ -7,7 +7,7 @@
 newPopEpidemic(
   rawPop,
   group_list = NULL,
-  donor_list = NULL,
+  indCases = NULL,
   simParam = NULL,
   nThreads = NULL,
   ...
@@ -20,20 +20,20 @@ newPopEpidemic(
 \item{group_list}{list of groups for the population. Each group is a separate
 epidemy. If NULL it is assumed there is only one group}
 
-\item{donor_list}{list of 0s and 1s indicating susceptible and donor 
-individuals, respectively. If any other number is passed this will cause an
-error. If NULL, it is assumed there is one donor per group.}
+\item{indCases}{list of 0s and 1s indicating susceptible and first infected
+individuals, respectively. If any other number is passed this will cause
+an error. If NULL, it is assumed there is one index case per group.}
 
 \item{simParam}{an object of \code{\link{SimParamEpidemic}}}
 
 \item{nThreads}{number of threads to use if OpenMP is available.
 If \code{NULL}, the number is obtained from \code{simParam$nThreads}.}
 
-\item{...}{additional arguments used internally (passed to 
+\item{...}{additional arguments used internally (passed to
 \code{\link[AlphaSimR:Pop-class]{newPop}})}
 }
 \value{
-Returns an object of \code{\link{PopEpidemic-class}} with a new slot 
+Returns an object of \code{\link{PopEpidemic-class}} with a new slot
  `dynamics`. See \code{\link{initDynamics}} for details
 }
 \description{

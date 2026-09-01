@@ -9,11 +9,11 @@
 #  X[]
 #}
 
-# Fix the disease trajectory of the initial donors using a model-specific
+# Fix the disease trajectory of the initial indCases using a model-specific
 # path generator (e.g. .generate_sir_path, .generate_sidr_path). Modifies X
 # by reference.
 #.epi_init_donors <- function(X, path_fn, simParam) {
-#  purrr::walk(X[, .I[donor == 1L]], \(i) {
+#  purrr::walk(X[, .I[indCases == 1L]], \(i) {
 #    data.table::set(X, i, c("status", simParam$timings),
 #                    path_fn(0.0, X, i, simParam))
 #  })
@@ -30,7 +30,7 @@
   # be arbitrary after crossing/subsetting), so we reorder to match epop@iid
   # rather than sorting ascending.
 #  Y <- Y[match(epop@iid, iid)]
-  
+
   # remove iid though
 #  Y[, iid := NULL]
 
