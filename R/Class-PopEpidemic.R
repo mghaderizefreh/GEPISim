@@ -84,13 +84,10 @@ newPopEpidemic <- function(rawPop, group_list = NULL, indCases = NULL,
 setMethod("show",
           signature(object = "PopEpidemic"),
           function (object){
-            cat("An object of class",
-                class(object), "\n")
-            cat("Ploidy:", object@ploidy,"\n")
-            cat("Individuals:", object@nInd,"\n")
-            cat("Chromosomes:", object@nChr,"\n")
-            cat("Loci:", sum(object@nLoci),"\n")
-            cat("Traits:", object@nTraits,"\n")
+            # Call the parent class's show method
+            callNextMethod()
+
+            # Add the epidemic-specific information
             cat("Model:", paste0(levels(object@dynamics$status),collapse = ''),
                 "\n")
             invisible()
