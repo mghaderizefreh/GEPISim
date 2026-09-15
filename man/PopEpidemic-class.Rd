@@ -32,19 +32,24 @@ NULL, it is assumed there is one index case per group.}
 the same input object `ePop` with the field `dynamics` initialised.
 }
 \description{
-A population with an epidemy. Extends \code{\link[AlphaSimR:Pop-class]{Pop}}
-class from AlphaSimR package to include a new slot and override some of
-the methods.
+A population with an epidemic. Extends \code{\link[AlphaSimR:Pop-class]{Pop}}
+class from AlphaSimR package to include a new slot and override some of the
+methods.
 }
 \details{
 The dynamics field is data.table with several columns,
+
 - Timing columns: these depend on the model used. They are supposed to be
   stored in the simParam and will be extracted from it
+
 - status: these also depend on the model used. In general they are the
   letters that define the model, e.g., SIR will have states S, I, and R
+
 - generation: Which type of infection is it, i.e., primary, secondary, etc.
   Initially set to 1 for all index cases
+
 - infected_by: the index of the individual that infects a given individual
+
 - group_inf: group infectivity level
 }
 \section{Functions}{
@@ -59,45 +64,12 @@ The dynamics field is data.table with several columns,
 \section{Slots}{
 
 \describe{
-\item{\code{id}}{an individual's identifier}
+\item{\code{dynamics}}{This will include dynamic information of the disease
+progression such as, time of infection/detection/recovery, transfer of
+disease between individuals, etc. See Details for more information.
 
-\item{\code{iid}}{an individual's internal identifier}
 
-\item{\code{mother}}{the identifier of the individual's mother}
-
-\item{\code{father}}{the identifier of the individual's father}
-
-\item{\code{sex}}{sex of individuals: "M" for males, "F" for females,
-and "H" for hermaphrodites}
-
-\item{\code{nTraits}}{number of traits}
-
-\item{\code{gv}}{matrix of genetic values. When using GxE traits,
-gv reflects gv when p=0.5. Dimensions are nInd by nTraits.}
-
-\item{\code{pheno}}{matrix of phenotypic values. Dimensions are
-nInd by nTraits.}
-
-\item{\code{ebv}}{matrix of estimated breeding values. Dimensions
-are nInd rows and a variable number of columns.}
-
-\item{\code{gxe}}{list containing GxE slopes for GxE traits}
-
-\item{\code{fixEff}}{a fixed effect relating to the phenotype.
-Used by genomic selection models but otherwise ignored.}
-
-\item{\code{misc}}{a list whose elements correspond to additional miscellaneous
-nodes with the items for individuals in the population (see example in
-\code{\link[AlphaSimR:newPop]{newPop}}) - we support vectors and matrices or
-objects that have a generic length and subset method.
-This list is normally empty and exists solely as an
-open slot available for users to store extra information about
-individuals.}
-
-\item{\code{miscPop}}{a list of any length containing optional meta data for the
-population (see example in \code{\link[AlphaSimR:newPop]{newPop}}).
-This list is empty unless information is supplied by the user.
-Note that the list is emptied every time the population is subsetted or
-combined because the meta data for old population might not be valid anymore.}
+See \code{\link[AlphaSimR:Pop-class]{Pop}} for description of all other
+fields}
 }}
 
