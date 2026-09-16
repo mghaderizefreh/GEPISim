@@ -50,10 +50,10 @@ SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
 following and is case-insensitive
 SIR,}
 
+    \item{\code{r_beta}}{mean transmission rate}
+
     \item{\code{removal_period}}{the mean time an individual remains in the "I" or
 infectious state before they are removed.}
-
-    \item{\code{r_beta}}{mean transmission rate}
 
     \item{\code{RP_shape}}{This is the shape of the gamma distribution for survival. A value of 1
 gives an exponential distribution. When RP_shape > 1, it indicates that
@@ -160,8 +160,8 @@ to generate this object}
     \preformatted{SimParamEpidemic$new(
   founderPop,
   model = "SIR",
-  removal_period = 10,
   r_beta = 0.5,
+  removal_period = 10,
   RP_shape = 1,
   detection_period = 10,
   DP_shape = 1,
@@ -177,10 +177,10 @@ to generate this object}
 \code{\link[AlphaSimR:Pop-class]{MapPop-class}}}
       \item{\code{model}}{see \code{\link[GEPISim]{SimParamEpidemic}} field
 \code{model}}
-      \item{\code{removal_period}}{see \code{\link[GEPISim]{SimParamEpidemic}}
-field \code{removal_period}}
       \item{\code{r_beta}}{see \code{\link[GEPISim]{SimParamEpidemic}} field
 \code{r_beta}}
+      \item{\code{removal_period}}{see \code{\link[GEPISim]{SimParamEpidemic}}
+field \code{removal_period}}
       \item{\code{RP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{RP_shape}}
       \item{\code{detection_period}}{\code{\link[GEPISim]{SimParamEpidemic}} field

@@ -23,14 +23,14 @@ SimParamEpidemic <- R6::R6Class(
     #'   SIR,
     model = NA_character_,
 
+    # r_beta field ----
+    #' @field r_beta mean transmission rate
+    r_beta = NA_real_,
+
     # removal_period field ----
     #' @field removal_period the mean time an individual remains in the "I" or
     #'   infectious state before they are removed.
     removal_period = NA_real_,
-
-    # r_beta field ----
-    #' @field r_beta mean transmission rate
-    r_beta = NA_real_,
 
     # RP_shape field ----
     #' @field RP_shape
@@ -106,11 +106,11 @@ SimParamEpidemic <- R6::R6Class(
     #' @param model see \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{model}
     #'
-    #' @param removal_period see \code{\link[GEPISim]{SimParamEpidemic}}
-    #'   field \code{removal_period}
-    #'
     #' @param r_beta see \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{r_beta}
+    #'
+    #' @param removal_period see \code{\link[GEPISim]{SimParamEpidemic}}
+    #'   field \code{removal_period}
     #'
     #' @param RP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{RP_shape}
@@ -136,8 +136,8 @@ SimParamEpidemic <- R6::R6Class(
     #' try(SP <- SimParamEpidemic$new(founderGenomes, model = "ABC"))
     initialize = function(founderPop,
                           model = "SIR",
-                          removal_period = 10,
                           r_beta = 0.5,
+                          removal_period = 10,
                           RP_shape = 1,
                           detection_period = 10,
                           DP_shape = 1,
@@ -150,8 +150,10 @@ SimParamEpidemic <- R6::R6Class(
       super$initialize(founderPop)
       private$.versionGEPISim <- packageDescription("GEPISim")$Version
       self$model <- model
-      self$removal_period = removal_period
       self$r_beta <- r_beta
+
+      # removal (or recovery) period - from I (or D if it exists) to R
+      self$removal_period = removal_period
       self$RP_shape <- RP_shape
       self$RP_scale <- removal_period / RP_shape
 
@@ -168,6 +170,12 @@ SimParamEpidemic <- R6::R6Class(
       self$compartments <- strsplit(model, split = "")[[1]] |> unique() |>
         as.list()
       private$.GetTimingsAndTraitNames()
+
+      # specifying the log-normality
+      self$finalizePheno <- function(pheno, pop, simParam = SP, ...){
+        pheno <- asLogNormal(pheno)
+        return(pheno)
+      }
 
       invisible(self)
     },

@@ -11,13 +11,10 @@ get_R0(ePop, simParam = NULL, method = 1)
 generations.}
 
 \item{simParam}{simulation parameter of type \code{\link{SimParamEpidemic}}}
-
-\item{method}{The method to use. 1 for the ratio of Gen 1 to Gen 2
-infectives or 2 based on García-Ballesteros et al 202x}
 }
 \value{
-An estimated R0
+R0 as the basic reproductive ratio
 }
 \description{
-Calculate R0 from the output of a simulated epidemic
+Calculate R0 given the model and phenotype values
 }
