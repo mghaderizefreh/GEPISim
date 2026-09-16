@@ -29,7 +29,7 @@ respectively. If any other number is passed this will cause an error. If
 NULL, it is assumed there is one index case per group.}
 }
 \value{
-the same input object `ePop` with the field `dynamics` initialised.
+the same input object \code{ePop} with the field \code{dynamics} initialised.
 }
 \description{
 A population with an epidemic. Extends \code{\link[AlphaSimR:Pop-class]{Pop}}
@@ -38,19 +38,15 @@ methods.
 }
 \details{
 The dynamics field is data.table with several columns,
-
-- Timing columns: these depend on the model used. They are supposed to be
-  stored in the simParam and will be extracted from it
-
-- status: these also depend on the model used. In general they are the
-  letters that define the model, e.g., SIR will have states S, I, and R
-
-- generation: Which type of infection is it, i.e., primary, secondary, etc.
-  Initially set to 1 for all index cases
-
-- infected_by: the index of the individual that infects a given individual
-
-- group_inf: group infectivity level
+\itemize{
+\item \strong{Timing columns}: These depend on the model. They are stored in
+\code{simParam} and will be extracted from it.
+\item \strong{\code{status}}: Model states (e.g., \code{S}, \code{I}, \code{R} in SIR).
+\item \strong{\code{generation}}: Infection type (e.g., primary, secondary). Set to \code{1} for
+index cases.
+\item \strong{\code{infected_by}}: Index of the infector.
+\item \strong{\code{group_inf}}: Group-level infectivity.
+}
 }
 \section{Functions}{
 \itemize{

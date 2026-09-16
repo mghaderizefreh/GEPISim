@@ -95,24 +95,25 @@ setMethod("show",
 )
 
 #' @describeIn PopEpidemic-class initialises the dynamic object
+#' @md
 #' @param ePop an \code{\link{PopEpidemic-class}} object
 #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
 #' @return the same input object `ePop` with the field `dynamics` initialised.
 #' @details
 #' The dynamics field is data.table with several columns,
 #'
-#' - Timing columns: these depend on the model used. They are supposed to be
-#'   stored in the simParam and will be extracted from it
+#' - **Timing columns**: These depend on the model. They are stored in
+#' `simParam` and will be extracted from it.
 #'
-#' - status: these also depend on the model used. In general they are the
-#'   letters that define the model, e.g., SIR will have states S, I, and R
+#' - **`status`**: Model states (e.g., `S`, `I`, `R` in SIR).
 #'
-#' - generation: Which type of infection is it, i.e., primary, secondary, etc.
-#'   Initially set to 1 for all index cases
+#' - **`generation`**: Infection type (e.g., primary, secondary). Set to `1` for
+#' index cases.
 #'
-#' - infected_by: the index of the individual that infects a given individual
+#' - **`infected_by`**: Index of the infector.
 #'
-#' - group_inf: group infectivity level
+#' - **`group_inf`**: Group-level infectivity.
+#'
 #' @export
 initDynamics <- function(ePop, simParam=NULL){
   if(is.null(simParam)){
