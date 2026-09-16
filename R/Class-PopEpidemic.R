@@ -48,7 +48,8 @@ setClass("PopEpidemic",
 #' @return Returns an object of \code{\link{PopEpidemic-class}} with a new slot
 #'  `dynamics`. See \code{\link{initDynamics}} for details
 #'
-#' @seealso \code{\link[AlphaSimR:Pop-class]{Pop}}, \code{\link{SimParamEpidemic}}
+#' @seealso \code{\link[AlphaSimR:Pop-class]{Pop}},
+#'  \code{\link{SimParamEpidemic}}
 #'
 #' @examples
 #' #Create founder haplotypes
@@ -64,17 +65,10 @@ setClass("PopEpidemic",
 #' @export
 newPopEpidemic <- function(rawPop, group_list = NULL, indCases = NULL,
                       simParam=NULL,nThreads=NULL,...){
-  if(is.null(simParam)){
-    simParam = get("SP",envir=.GlobalEnv)
-  }
-  if(is.null(nThreads)){
-    nThreads = simParam$nThreads
-  }else{
-    nThreads = as.integer(nThreads)
-  }
-  pop <- AlphaSimR::newPop(rawPop, simParam = simParam, nThreads = nThreads,
-                           ...)
+  # call the parent high-level function newPop from AlphaSimR
+  pop <- AlphaSimR::newPop(rawPop, simParam = simParam, nThreads = nThreads,...)
 
+  # cast the output to new class
   asPopEpidemic(pop, simParam = simParam, group_list = group_list,
                 indCases = indCases)
 }
@@ -86,7 +80,6 @@ setMethod("show",
           function (object){
             # Call the parent class's show method
             callNextMethod()
-
             # Add the epidemic-specific information
             cat("Model:", paste0(levels(object@dynamics$status),collapse = ''),
                 "\n")
@@ -151,7 +144,8 @@ initDynamics <- function(ePop, simParam=NULL){
 #'   NULL, it is assumed there is one index case per group.
 #' @param simParam simulation parameter (of type SimParamEpidemic)
 #' @export
-asPopEpidemic <- function(from, group_list = NULL, indCases = NULL, simParam = NULL){
+asPopEpidemic <- function(from, group_list = NULL, indCases = NULL,
+                          simParam = NULL){
   if (is.null(group_list)){ # if no group provided, assume only 1 group
     group_list <- rep(1L, from@nInd)
   }

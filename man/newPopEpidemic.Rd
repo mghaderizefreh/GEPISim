@@ -57,5 +57,6 @@ pop = newPopEpidemic(founderPop)
 
 }
 \seealso{
-\code{\link[AlphaSimR:Pop-class]{Pop}}, \code{\link{SimParamEpidemic}}
+\code{\link[AlphaSimR:Pop-class]{Pop}},
+ \code{\link{SimParamEpidemic}}
 }
