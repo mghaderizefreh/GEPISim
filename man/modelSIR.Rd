@@ -4,13 +4,21 @@
 \alias{modelSIR}
 \title{modelSIR}
 \usage{
-modelSIR(epop, simParam = NULL)
+modelSIR(
+  epop,
+  simParam = NULL,
+  epi_traits = c(s = "sus", i = "inf", t = "tol")
+)
 }
 \arguments{
-\item{epop}{A population with an epidemy, an object of class
+\item{epop}{A population with an epidemic, an object of class
 \code{\link{PopEpidemic-class}}}
 
 \item{simParam}{a \code{\link{SimParamEpidemic}} object}
+
+\item{epi_traits}{Name of the traits (column names) of phenotypes (`pheno` in
+`epop`) for `s` (susecptibility), `i` (infectivity) and `t` (tolerance). The
+default values are "sus", "inf" and "tol", respectively.}
 }
 \value{
 Returns the same input object of type \code{\link{PopEpidemic-class}}

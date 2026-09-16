@@ -3,12 +3,11 @@
 #'
 #' @description container for global epidemic simulation parameter. The users
 #' of this object assume it is stored in environment as "SP", if this object
-#' is not explicitly passed. This is the practice in AlphaSimR and SimPlyBee
+#' is not explicitly passed.
 #'
-#' @details This documentation shows details specific to \code{SimParamEpidemic}.
-#'   We suggest that you also read all the options provided by the AlphaSimR
-#'   \code{\link[AlphaSimR]{SimParam}}. Below we show minimal usage cases for
-#'   each \code{SimParamEpidemic} function.
+#' @details This documentation shows details specific to
+#' \code{SimParamEpidemic}. It is strongly recommended that you also read the
+#' options provided by the AlphaSimR \code{\link[AlphaSimR]{SimParam}}.
 #'
 #' @export
 SimParamEpidemic <- R6::R6Class(
@@ -178,93 +177,7 @@ SimParamEpidemic <- R6::R6Class(
       }
 
       invisible(self)
-    },
-
-    ### Overriding Traits methods (Public) ----
-
-    #' @description
-    #' Randomly assigns eligible QTLs for one or more additive traits.
-    #' If simulating more than one trait, all traits will be pleiotropic
-    #' with correlated additive effects. This is a wrapper around the function
-    #' \code{\link[AlphaSimR]{SimParam}} method \code{addTraitsA} except the
-    #' mean is forced to be zero and names are automatically inferred from the
-    #' field \code{epi_traits} of the object
-    #' \code{\link[GEPISim]{SimParamEpidemic}}
-    #'
-    #' @param nQtlPerChr number of QTLs per chromosome. Can be a single value or
-    #'   nChr values.
-    #' @param mean a vector of mean genetic values for the traits. These will be
-    #'   ignored as they are forced to be zero.
-    #' @param var a vector of desired genetic variances for the traits. If a
-    #'   scalar is provided it will be recycled to provide a variance vector of
-    #'   length(name)
-    #' @param corA a matrix of correlations between additive effects. If NULL is
-    #'   passed, it will replaced by the identity matrix
-    #' @param gamma should a gamma distribution be used instead of normal. This
-    #'   is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}
-    #' @param shape the shape parameter for the gamma distribution
-    #'   (the rate/scale parameter of the gamma distribution is accounted
-    #'   for via the desired level of genetic variance, the var argument). This
-    #'   is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}
-    #' @param force should the check for a running simulation be
-    #' ignored. Only set to TRUE if you know what you are doing.
-    #' @param name Name of the epidemiological traits. if NULL is passed, then
-    #'   the names will be inferred from the model name, otherwise they should
-    #'   match the field \code{epi_traits} of the object
-    #'   \code{\link[GEPISim]{SimParamEpidemic}}
-    #' @param nThreads number of threads to use if OpenMP is available.
-    #' If \code{NULL}, the number is obtained from \code{self$nThreads}.
-    #'
-    #' @examples
-    #' #Create founder haplotypes
-    #' founderPop = quickHaplo(nInd=10, nChr=1, segSites=10)
-    #'
-    #' #Set simulation parameters
-    #' SP1 = SimParamEpidemic$new(founderPop, "SIR")
-    #' SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
-    #'
-    #'
-    addTraitA = function(nQtlPerChr,mean=0,var=1,corA=NULL,
-                         gamma=FALSE,shape=1,force=FALSE,name=NULL,
-                         nThreads=NULL){
-      if (is.null(name)){
-        name = unname(self$epi_traits)
-      } else{
-        stopifnot(
-          "Provided names do not match the names from the model. Pass NULL if in doubt"=
-                    all(name%in%unname(self$epi_traits)))
-      }
-      if (length(mean) == 1){
-        mean <- rep(mean, length(name))
-      }
-
-      if (!all(mean==0)){
-        warning("Non zero mean values were passed. They will be forced to zero")
-        mean <- rep(0, length(name))
-      }
-
-      if (length(var) == 1){
-        var <- rep(var, length(name))
-      } else {
-        stopifnot("var should have length 1 or length(SP$epi_traits)" =
-                    length(var) == length(name))
-      }
-
-      if (is.null(corA)){
-        corA = diag(rep(1,length(name)))
-      } else{
-        stopifnot(
-          "corA should be NULL or square matrix of size length(SP$epi_traits)" =
-                    identical(dim(corA), c(length(name), length(name))))
-      }
-
-      super$addTraitA(nQtlPerChr, mean = mean, var = var, corA = corA,
-                      gamma = gamma, shape = shape, force = force,
-                      name = name, nThreads = nThreads)
-
-      invisible(self)
     }
-
 
   ),
   private = list(

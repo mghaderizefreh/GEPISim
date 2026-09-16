@@ -18,14 +18,19 @@ run <- function(epop,simParam=NULL){
 #' Compartmental model SIR - Susceptibility, Infectivity, Recovrability
 #'  (or Removed)).
 #'
-#' @param epop A population with an epidemy, an object of class
+#' @param epop A population with an epidemic, an object of class
 #' \code{\link{PopEpidemic-class}}
 #' @param simParam a \code{\link{SimParamEpidemic}} object
+#' @param epi_traits Name of the traits (column names) of phenotypes (`pheno` in
+#'  `epop`) for `s` (susecptibility), `i` (infectivity) and `t` (tolerance). The
+#'  default values are "sus", "inf" and "tol", respectively.
 #'
 #' @return Returns the same input object of type \code{\link{PopEpidemic-class}}
 #' with the \code{dynamic} field populated with evolution of the epidemy
-modelSIR <- function(epop, simParam = NULL) {
-  DEBUG <- F
+modelSIR <- function(
+    epop, simParam = NULL,
+    epi_traits = c(s = "sus", i = "inf", t = "tol")) {
+
   if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
 
   stopifnot("simParam must be a SimParamEpidemic object"=
@@ -35,9 +40,16 @@ modelSIR <- function(epop, simParam = NULL) {
             "Not an SIR model"=
               toupper(simParam$model)=="SIR")
 
+  # Check if we indeed have the phenotypes we need
+  for (epitrait in epi_traits){
+    if (!epitrait %in% colnames(epop@pheno)) {
+      stop(epitrait, " is not defined as a phenotype")
+    }
+  }
+
   .generate_sir_path <- function(epi_time, X, id, simParam) {
     rgamma(1L, simParam$RP_shape,
-           scale = simParam$RP_scale * X$tol[[id]]) + epi_time
+           scale = simParam$RP_scale * X[[epi_traits['t']]][[id]]) + epi_time
   }
 
   # Find the no. of individuals capable of infecting susceptible individuals at
@@ -74,7 +86,6 @@ modelSIR <- function(epop, simParam = NULL) {
     # Start epidemic simulation loop ----
     epi_time <- 0.0
     while (.get_sir_infectives(X) > 0L) {
-      if (DEBUG) message("time = ", signif(epi_time, 5))
 
       # Calculate infection rates in each group ----
       #X[, group_inf := r_beta * GE * mean(inf * (status == "I"))]
@@ -89,20 +100,14 @@ modelSIR <- function(epop, simParam = NULL) {
 
       if (is.na(t_next_event)) t_next_event <- Inf
 
-      if (DEBUG) message("Next NI event id = ", id_next_event, " at t = ",
-                         signif(t_next_event, 5))
-
       # generate random timestep ----
       total_inf_rate <- sum(X$inf_rate)
 
       # calculate dt if infections event rate > 0
       dt <- rexp(1L) / total_inf_rate
 
-      if (DEBUG) message("Total infections event rate = ", total_inf_rate)
-
       # check if next event is infection or non-infection ----
       if (epi_time + dt < t_next_event) {
-        if (DEBUG) message("next event is infection at t = ", epi_time)
 
         epi_time <- epi_time + dt
 
@@ -121,11 +126,7 @@ modelSIR <- function(epop, simParam = NULL) {
 
         ni_events[I == id_next_event, time := sir_path]
 
-        if (DEBUG) message("ID ", id_next_event,
-                           ": S -> I, infected by ID ", infd_by)
       } else {
-        if (DEBUG) message("next event is non-infection at t = ",
-                           signif(t_next_event, 5))
 
         epi_time <- t_next_event
 
@@ -134,7 +135,6 @@ modelSIR <- function(epop, simParam = NULL) {
         status <- X$status[[id_next_event]]
 
         if (status == "I") {
-          if (DEBUG) message("ID ", id_next_event, ": I -> R")
           data.table::set(X, id_next_event, "status", "R")
         } else {
           message("status = ", status)
@@ -149,9 +149,6 @@ modelSIR <- function(epop, simParam = NULL) {
 
       data.table::setorder(ni_events, time, na.last = TRUE)
 
-      if (DEBUG == 2) {
-        print(X[,.(group, indCases, status, Tinf, Tdeath, group_inf, inf_rate)])
-      }
     }
     X
   }) |> rbindlist()

@@ -6,13 +6,12 @@
 \description{
 container for global epidemic simulation parameter. The users
 of this object assume it is stored in environment as "SP", if this object
-is not explicitly passed. This is the practice in AlphaSimR and SimPlyBee
+is not explicitly passed.
 }
 \details{
-This documentation shows details specific to \code{SimParamEpidemic}.
-  We suggest that you also read all the options provided by the AlphaSimR
-  \code{\link[AlphaSimR]{SimParam}}. Below we show minimal usage cases for
-  each \code{SimParamEpidemic} function.
+This documentation shows details specific to
+\code{SimParamEpidemic}. It is strongly recommended that you also read the
+options provided by the AlphaSimR \code{\link[AlphaSimR]{SimParam}}.
 }
 \examples{
 
@@ -26,19 +25,6 @@ SP <- SimParamEpidemic$new(founderGenomes) # default model is "SIR"
 
 # there are only a few models to select from
 try(SP <- SimParamEpidemic$new(founderGenomes, model = "ABC"))
-
-## ------------------------------------------------
-## Method `SimParamEpidemic$addTraitA()`
-## ------------------------------------------------
-
-#Create founder haplotypes
-founderPop = quickHaplo(nInd=10, nChr=1, segSites=10)
-
-#Set simulation parameters
-SP1 = SimParamEpidemic$new(founderPop, "SIR")
-SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
-
-
 }
 \section{Super class}{
 \code{\link[AlphaSimR:SimParam]{AlphaSimR::SimParam}} -> \code{SimParamEpidemic}
@@ -108,7 +94,6 @@ to generate this object}
 \subsection{Public methods}{
   \itemize{
     \item \href{#method-SimParamEpidemic-initialize}{\code{SimParamEpidemic$new()}}
-    \item \href{#method-SimParamEpidemic-addTraitA}{\code{SimParamEpidemic$addTraitA()}}
     \item \href{#method-SimParamEpidemic-clone}{\code{SimParamEpidemic$clone()}}
   }
 }
@@ -119,6 +104,7 @@ to generate this object}
   <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addStructuredSnpChip"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addStructuredSnpChip'><code>AlphaSimR::SimParam$addStructuredSnpChip()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addToPed"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addToPed'><code>AlphaSimR::SimParam$addToPed()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addToRec"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addToRec'><code>AlphaSimR::SimParam$addToRec()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitA"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitA'><code>AlphaSimR::SimParam$addTraitA()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitAD"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitAD'><code>AlphaSimR::SimParam$addTraitAD()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADE"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADE'><code>AlphaSimR::SimParam$addTraitADE()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="AlphaSimR" data-topic="SimParam" data-id="addTraitADEG"><a href='../../AlphaSimR/html/SimParam.html#method-SimParam-addTraitADEG'><code>AlphaSimR::SimParam$addTraitADEG()</code></a></span></li>
@@ -201,74 +187,6 @@ SP <- SimParamEpidemic$new(founderGenomes) # default model is "SIR"
 
 # there are only a few models to select from
 try(SP <- SimParamEpidemic$new(founderGenomes, model = "ABC"))
-}
-    \if{html}{\out{</div>}}
-  }
-}
-
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-SimParamEpidemic-addTraitA"></a>}}
-\if{latex}{\out{\hypertarget{method-SimParamEpidemic-addTraitA}{}}}
-\subsection{\code{SimParamEpidemic$addTraitA()}}{
-  Randomly assigns eligible QTLs for one or more additive traits.
-If simulating more than one trait, all traits will be pleiotropic
-with correlated additive effects. This is a wrapper around the function
-\code{\link[AlphaSimR]{SimParam}} method \code{addTraitsA} except the
-mean is forced to be zero and names are automatically inferred from the
-field \code{epi_traits} of the object
-\code{\link[GEPISim]{SimParamEpidemic}}
-  \subsection{Usage}{
-    \if{html}{\out{<div class="r">}}
-    \preformatted{SimParamEpidemic$addTraitA(
-  nQtlPerChr,
-  mean = 0,
-  var = 1,
-  corA = NULL,
-  gamma = FALSE,
-  shape = 1,
-  force = FALSE,
-  name = NULL,
-  nThreads = NULL
-)}
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Arguments}{
-    \if{html}{\out{<div class="arguments">}}
-    \describe{
-      \item{\code{nQtlPerChr}}{number of QTLs per chromosome. Can be a single value or
-nChr values.}
-      \item{\code{mean}}{a vector of mean genetic values for the traits. These will be
-ignored as they are forced to be zero.}
-      \item{\code{var}}{a vector of desired genetic variances for the traits. If a
-scalar is provided it will be recycled to provide a variance vector of
-length(name)}
-      \item{\code{corA}}{a matrix of correlations between additive effects. If NULL is
-passed, it will replaced by the identity matrix}
-      \item{\code{gamma}}{should a gamma distribution be used instead of normal. This
-is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}}
-      \item{\code{shape}}{the shape parameter for the gamma distribution
-(the rate/scale parameter of the gamma distribution is accounted
-for via the desired level of genetic variance, the var argument). This
-is not recommended for \code{\link[GEPISim]{SimParamEpidemic}}}
-      \item{\code{force}}{should the check for a running simulation be
-ignored. Only set to TRUE if you know what you are doing.}
-      \item{\code{name}}{Name of the epidemiological traits. if NULL is passed, then
-the names will be inferred from the model name, otherwise they should
-match the field \code{epi_traits} of the object
-\code{\link[GEPISim]{SimParamEpidemic}}}
-      \item{\code{nThreads}}{number of threads to use if OpenMP is available.
-If \code{NULL}, the number is obtained from \code{self$nThreads}.}
-    }
-    \if{html}{\out{</div>}}
-  }
-  \subsection{Examples}{
-    \if{html}{\out{<div class="r example copy">}}
-    \preformatted{#Create founder haplotypes
-founderPop = quickHaplo(nInd=10, nChr=1, segSites=10)
-
-#Set simulation parameters
-SP1 = SimParamEpidemic$new(founderPop, "SIR")
-SP1$addTraitA(name = c('i','r','s'), nThreads = 1L)
 }
     \if{html}{\out{</div>}}
   }
