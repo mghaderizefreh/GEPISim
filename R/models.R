@@ -1,14 +1,49 @@
-#' @title run
+#' @title runEpidemic
 #' @description
-#' General wrapper for all compartmental model
-#' @param epop A population with an epidemy, an object of class
-#' \code{\link{PopEpidemic-class}}
+#' General wrapper for all compartmental models
+#' @param epop A population with an epidemic, an object of class
+#'  \code{\link{PopEpidemic-class}}
 #' @param simParam a \code{\link{SimParamEpidemic}} object
-#' @name run
-#' @rdname run
+#' @param ... Other inputs passed to specific functions. See details
+#' @name runEpidemic
+#' @rdname runEpidemic
+#'
+#' @examples
+#' # Create founder haplotypes
+#' founderPop <- quickHaplo(nInd = 10, nChr = 1, segSites = 10)
+#'
+#' # Set simulation parameters
+#' SP = SimParamEpidemic$new(founderPop, model = "SIR")
+#' means <- rep(0, nchar(SP$model))
+#' vars <- rep(1, nchar(SP$model))
+#' SP$addTraitA(10, mean = means, var = vars, names = c("sus","inf","tol"))
+#'
+#' # Create population assuming one random index case
+#' pop = newPopEpidemic(founderPop, indexCases = sample(founderPop@nInd, 1))
+#'
+#' # Run Epidemic
+#' pop = run(pop)
+#'
 #' @export
-run <- function(epop,simParam=NULL){
+runEpidemic <- function(epop,simParam=NULL){
+
+  if (!is(epop, "PopEpidemic") & is(epop, "Pop")){
+    warning("epop is a Pop object. Use the function asPopEpidemic to convert it.")
+  }
+  stopifnot("simParam must be a SimParamEpidemic object"=
+              is(simParam, "SimParamEpidemic"),
+            "epop must be a PopEpidemic object."=
+              is(epop, "PopEpidemic"))
+
   if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
+
+  # Check if we indeed have the phenotypes we need
+  for (epitrait in simParam$epi_traits){
+    if (!epitrait %in% colnames(epop@pheno)) {
+      stop('"',epitrait, "\" is not defined as a phenotype")
+    }
+  }
+
   f <- get(paste0("model",toupper(simParam$model)))
   f(epop, simParam)
 }
@@ -16,40 +51,21 @@ run <- function(epop,simParam=NULL){
 #' @title modelSIR
 #' @description
 #' Compartmental model SIR - Susceptibility, Infectivity, Recovrability
-#'  (or Removed)).
+#'  (or Removed).
 #'
 #' @param epop A population with an epidemic, an object of class
 #' \code{\link{PopEpidemic-class}}
 #' @param simParam a \code{\link{SimParamEpidemic}} object
-#' @param epi_traits Name of the traits (column names) of phenotypes (`pheno` in
-#'  `epop`) for `s` (susecptibility), `i` (infectivity) and `t` (tolerance). The
-#'  default values are "sus", "inf" and "tol", respectively.
 #'
 #' @return Returns the same input object of type \code{\link{PopEpidemic-class}}
-#' with the \code{dynamic} field populated with evolution of the epidemy
-modelSIR <- function(
-    epop, simParam = NULL,
-    epi_traits = c(s = "sus", i = "inf", t = "tol")) {
+#' with the \code{dynamics} field populated with evolution of the epidemic
+modelSIR <- function(epop, simParam) {
 
-  if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
-
-  stopifnot("simParam must be a SimParamEpidemic object"=
-              is(simParam, "SimParamEpidemic"),
-            "epop must be a PopEpidemic object"=
-              is(epop, "PopEpidemic"),
-            "Not an SIR model"=
-              toupper(simParam$model)=="SIR")
-
-  # Check if we indeed have the phenotypes we need
-  for (epitrait in epi_traits){
-    if (!epitrait %in% colnames(epop@pheno)) {
-      stop(epitrait, " is not defined as a phenotype")
-    }
-  }
+  et <- simParam$epi_traits
 
   .generate_sir_path <- function(epi_time, X, id, simParam) {
     rgamma(1L, simParam$RP_shape,
-           scale = simParam$RP_scale * X[[epi_traits['t']]][[id]]) + epi_time
+           scale = simParam$RP_scale * X[[et['t']]][[id]]) + epi_time
   }
 
   # Find the no. of individuals capable of infecting susceptible individuals at
@@ -118,18 +134,23 @@ modelSIR <- function(
         infd_by <- X$iid[[xi]]
         next_gen <- X$generation[[xi]] + 1L
 
+        # get the recovery (death) time of the infected individual
         sir_path <- .generate_sir_path(epi_time, X, id_next_event, simParam)
 
-        set(X, id_next_event,
-            c("status", "Tinf", "Tdeath", "generation", "infected_by"),
-            c("I", epi_time, as.list(sir_path), next_gen, infd_by))
+        # store everything for that individual
+        data.table::set(
+          X, id_next_event,
+          c("status", "Tinf", "Tdeath", "generation", "infected_by"),
+          c("I", epi_time, as.list(sir_path), next_gen, infd_by))
 
+        # also add the T_death to the priority queue
         ni_events[I == id_next_event, time := sir_path]
 
       } else {
 
         epi_time <- t_next_event
 
+        # remove the death time for that (1st) individual from the queue
         data.table::set(ni_events, 1L, "time", NA)
 
         status <- X$status[[id_next_event]]
@@ -161,9 +182,10 @@ modelSIR <- function(
   # remove iid though
   Y[, iid := NULL]
 
-  # adding this column (what is this)
-  #Y[, parasites := !is.na(Tinf)]
+  # and the phenotypes
+  Y[,colnames(epop@pheno) := NULL]
 
+  # also these two columns are no longer needed
   Y[, c("group_inf", "inf_rate") := NULL]
 
   final_t <- max(Y$Tdeath, na.rm = TRUE)
@@ -178,22 +200,15 @@ modelSIR <- function(
 #' Compartmental model SEIR - Susceptible, Exposed, Infectious, Recovered
 #'  (or Removed).
 #'
-#' @param epop A population with an epidemy, an object of class
+#' @param epop A population with an epidemic, an object of class
 #' \code{\link{PopEpidemic-class}}
 #' @param simParam a \code{\link{SimParamEpidemic}} object
 #'
 #' @return Returns the same input object of type \code{\link{PopEpidemic-class}}
-#'  with the \code{dynamic} field populated with evolution of the epidemy
-modelSEIR <- function(epop, simParam = NULL) {
-  DEBUG <- F
-  if (is.null(simParam)) simParam = get("SP", envir = .GlobalEnv)
+#'  with the \code{dynamics} field populated with evolution of the epidemic
+modelSEIR <- function(epop, simParam) {
 
-  stopifnot("simParam must be a SimParamEpidemic object" =
-              is(simParam, "SimParamEpidemic"),
-            "epop must be a PopEpidemic object" =
-              is(epop, "PopEpidemic"),
-            "Not an SEIR model" =
-              toupper(simParam$model) == "SEIR")
+  et <- simParam$epi_traits
 
   # A susceptible individual's future trajectory is fixed at the moment of
   # exposure. Returns the cumulative event times [Tsign, Tdeath] measured from
@@ -201,8 +216,8 @@ modelSEIR <- function(epop, simParam = NULL) {
   # phenotype), then the I -> R transition (infectious period, scaled by `tol`).
   .generate_seir_path <- function(epi_time, X, id, simParam) {
     rgamma(2L, c(simParam$LP_shape, simParam$RP_shape),
-           scale = c(simParam$LP_scale * X$lat[[id]],
-                     simParam$RP_scale * X$tol[[id]])) |> cumsum() +
+           scale = c(simParam$LP_scale * X[[et['l']]][[id]],
+                     simParam$RP_scale * X[[et['t']]][[id]])) |> cumsum() +
       epi_time
   }
 
@@ -246,7 +261,6 @@ modelSEIR <- function(epop, simParam = NULL) {
     # Start epidemic simulation loop ----
     epi_time <- 0.0
     while (.get_seir_infectives(X) > 0L) {
-      if (DEBUG) message("time = ", epi_time)
 
       # Calculate infection rates in each group ----
       # Only "I" individuals are infectious; "E" individuals are not yet.
@@ -262,20 +276,14 @@ modelSEIR <- function(epop, simParam = NULL) {
 
       if (is.na(t_next_event)) t_next_event <- Inf
 
-      if (DEBUG) message("Next NI event id = ", id_next_event, " at t = ",
-                         t_next_event)
-
       # generate random timestep ----
       total_inf_rate <- sum(X$inf_rate)
 
       # calculate dt if infections event rate > 0
       dt <- rexp(1L) / total_inf_rate
 
-      if (DEBUG) message("Total infections event rate = ", total_inf_rate)
-
       # check if next event is infection or non-infection ----
       if (epi_time + dt < t_next_event) {
-        if (DEBUG) message("next event is infection at t = ", epi_time)
 
         epi_time <- epi_time + dt
 
@@ -300,10 +308,7 @@ modelSEIR <- function(epop, simParam = NULL) {
         # resolved by status when popped.
         ni_events[I == id_next_event, time := seir_path]
 
-        if (DEBUG) message("ID ", id_next_event,
-                           ": S -> E, infected by ID ", infd_by)
       } else {
-        if (DEBUG) message("next event is non-infection at t = ", t_next_event)
 
         epi_time <- t_next_event
 
@@ -312,11 +317,9 @@ modelSEIR <- function(epop, simParam = NULL) {
         status <- X$status[[id_next_event]]
 
         if (status == "E") {
-          if (DEBUG) message("ID ", id_next_event, ": E -> I")
-          set(X, id_next_event, "status", "I")
+          data.table::set(X, id_next_event, "status", "I")
         } else if (status == "I") {
-          if (DEBUG) message("ID ", id_next_event, ": I -> R")
-          set(X, id_next_event, "status", "R")
+          data.table::set(X, id_next_event, "status", "R")
         } else {
           message("status = ", status)
           print(X[, .(group, indCases, status, Tinf, Tsign, Tdeath,
@@ -330,10 +333,6 @@ modelSEIR <- function(epop, simParam = NULL) {
 
       data.table::setorder(ni_events, time, na.last = TRUE)
 
-      if (DEBUG == 2) {
-        print(X[, .(group, indCases, status, Tinf, Tsign, Tdeath,
-                    group_inf, inf_rate)])
-      }
     }
     X
   }) |> rbindlist()
@@ -346,6 +345,10 @@ modelSEIR <- function(epop, simParam = NULL) {
   # remove iid though
   Y[, iid := NULL]
 
+  # and the phenotypes
+  Y[,colnames(epop@pheno) := NULL]
+
+  # also these two columns are no longer needed
   Y[, c("group_inf", "inf_rate") := NULL]
 
   final_t <- max(Y$Tdeath, na.rm = TRUE)
@@ -361,22 +364,15 @@ modelSEIR <- function(epop, simParam = NULL) {
 #' Compartmental model SIDR - Susceptible, Infectious, Detected, Recovered
 #'  (or Removed).
 #'
-#' @param epop A population with an epidemy, an object of class
+#' @param epop A population with an epidemic, an object of class
 #' \code{\link{PopEpidemic-class}}
 #' @param simParam a \code{\link{SimParamEpidemic}} object
 #'
 #' @return Returns the same input object of type \code{\link{PopEpidemic-class}}
-#'  with the \code{dynamic} field populated with evolution of the epidemy
-modelSIDR <- function(epop, simParam = NULL) {
-  DEBUG <- F
-  if (is.null(simParam)) simParam = get("SP", envir = .GlobalEnv)
+#'  with the \code{dynamics} field populated with evolution of the epidemic
+modelSIDR <- function(epop, simParam) {
 
-  stopifnot("simParam must be a SimParamEpidemic object" =
-              is(simParam, "SimParamEpidemic"),
-            "epop must be a PopEpidemic object" =
-              is(epop, "PopEpidemic"),
-            "Not an SIDR model" =
-              toupper(simParam$model) == "SIDR")
+  et <- simParam$epi_traits
 
   # A susceptible individual's future trajectory is fixed at the moment of
   # infection. Returns the cumulative event times [Tsign, Tdeath] measured from
@@ -385,8 +381,9 @@ modelSIDR <- function(epop, simParam = NULL) {
   # `tol`).
   .generate_sidr_path <- function(epi_time, X, id, simParam) {
     cumsum(rgamma(2L, c(simParam$DP_shape, simParam$RP_shape),
-                  scale = c(simParam$DP_scale * X$det[[id]],
-                            simParam$RP_scale * X$tol[[id]]))) + epi_time
+                  scale = c(simParam$DP_scale * X[[et['d']]][[id]],
+                            simParam$RP_scale * X[[et['t']]][[id]]))) +
+                            epi_time
   }
 
   # Individuals that can still drive the epidemic. In SIDR BOTH "I" and "D" are
@@ -402,7 +399,7 @@ modelSIDR <- function(epop, simParam = NULL) {
   # Seed indCases into the I compartment with a fixed future trajectory
   purrr::walk(X[, .I[indCases == 1L]], \(i) {
     data.table::set(X, i, c("status", simParam$timings),
-                    c("I", 0.0,
+                    c(simParam$compartments[[2]], 0.0,
                       as.list(.generate_sidr_path(0.0, X, i, simParam))))
   })
 
@@ -428,8 +425,6 @@ modelSIDR <- function(epop, simParam = NULL) {
     # Start epidemic simulation loop ----
     epi_time <- 0.0
     while (.get_sidr_infectives(X) > 0L) {
-      if (DEBUG) message("time = ", epi_time)
-
       # Calculate infection rates in each group ----
       # Both "I" and "D" individuals are infectious.
       #X[, group_inf := r_beta * GE * mean(inf * (status %in% c("I", "D")))]
@@ -444,20 +439,14 @@ modelSIDR <- function(epop, simParam = NULL) {
 
       if (is.na(t_next_event)) t_next_event <- Inf
 
-      if (DEBUG) message("Next NI event id = ", id_next_event, " at t = ",
-                         t_next_event)
-
       # generate random timestep ----
       total_inf_rate <- sum(X$inf_rate)
 
       # calculate dt if infections event rate > 0
       dt <- rexp(1L) / total_inf_rate
 
-      if (DEBUG) message("Total infections event rate = ", total_inf_rate)
-
       # check if next event is infection or non-infection ----
       if (epi_time + dt < t_next_event) {
-        if (DEBUG) message("next event is infection at t = ", epi_time)
 
         epi_time <- epi_time + dt
 
@@ -479,11 +468,7 @@ modelSIDR <- function(epop, simParam = NULL) {
         # Update this individual's two queued events.
         ni_events[I == id_next_event, time := sidr_path]
 
-        if (DEBUG) message("ID ", id_next_event,
-                           ": S -> I, infected by ID ", infd_by)
       } else {
-        if (DEBUG) message("next event is non-infection at t = ",
-                           signif(t_next_event, 5))
 
         epi_time <- t_next_event
 
@@ -492,10 +477,8 @@ modelSIDR <- function(epop, simParam = NULL) {
         status <- X$status[[id_next_event]]
 
         if (status == "I") {
-          if (DEBUG) message("ID ", id_next_event, ": I -> D")
           data.table::set(X, id_next_event, "status", "D")
         } else if (status == "D") {
-          if (DEBUG) message("ID ", id_next_event, ": D -> R")
           data.table::set(X, id_next_event, "status", "R")
         } else {
           message("status = ", status)
@@ -510,10 +493,6 @@ modelSIDR <- function(epop, simParam = NULL) {
 
       data.table::setorder(ni_events, time, na.last = TRUE)
 
-      if (DEBUG == 2) {
-        print(X[, .(group, indCases, status, Tinf, Tsign, Tdeath,
-                    group_inf, inf_rate)])
-      }
     }
     X
   }) |> rbindlist()
@@ -524,6 +503,10 @@ modelSIDR <- function(epop, simParam = NULL) {
   # remove iid though
   Y[, iid := NULL]
 
+  # and the phenotypes
+  Y[,colnames(epop@pheno) := NULL]
+
+  # also these two columns are no longer needed
   Y[, c("group_inf", "inf_rate") := NULL]
 
   final_t <- max(Y$Tdeath, na.rm = TRUE)
@@ -540,22 +523,15 @@ modelSIDR <- function(epop, simParam = NULL) {
 #' Compartmental model SEIDR - Susceptible, Exposed, Infectious, Detected,
 #'  Recovered (or Removed).
 #'
-#' @param epop A population with an epidemy, an object of class
+#' @param epop A population with an epidemic, an object of class
 #' \code{\link{PopEpidemic-class}}
 #' @param simParam a \code{\link{SimParamEpidemic}} object
 #'
 #' @return Returns the same input object of type \code{\link{PopEpidemic-class}}
-#'  with the \code{dynamic} field populated with evolution of the epidemy
-modelSEIDR <- function(epop, simParam = NULL) {
-  DEBUG <- F
-  if (is.null(simParam)) simParam = get("SP", envir = .GlobalEnv)
+#'  with the \code{dynamics} field populated with evolution of the epidemic
+modelSEIDR <- function(epop, simParam) {
 
-  stopifnot("simParam must be a SimParamEpidemic object" =
-              is(simParam, "SimParamEpidemic"),
-            "epop must be a PopEpidemic object" =
-              is(epop, "PopEpidemic"),
-            "Not an SEIDR model" =
-              toupper(simParam$model) == "SEIDR")
+  et <- simParam$epi_traits
 
   # A susceptible individual's future trajectory is fixed at the moment of
   # exposure. Returns the cumulative event times [Tinc, Tsign, Tdeath] measured
@@ -565,9 +541,9 @@ modelSEIDR <- function(epop, simParam = NULL) {
   .generate_seidr_path <- function(epi_time, X, id, simParam) {
     cumsum(rgamma(3L,
                   c(simParam$LP_shape, simParam$DP_shape, simParam$RP_shape),
-                  scale = c(simParam$LP_scale * X$lat[[id]],
-                            simParam$DP_scale * X$det[[id]],
-                            simParam$RP_scale * X$tol[[id]]))) + epi_time
+                  scale = c(simParam$LP_scale * X[[et['l']]][[id]],
+                            simParam$DP_scale * X[[et['d']]][[id]],
+                            simParam$RP_scale * X[[et['t']]][[id]]))) + epi_time
   }
 
   # Individuals that can still drive the epidemic, i.e. those that are
@@ -597,7 +573,7 @@ modelSEIDR <- function(epop, simParam = NULL) {
 
   Y <- purrr::map(Xgroups, \(X) {
     # Priority queue for the next non-infection event. Each individual now has
-    # THREE scheduled non-infection events (E -> I at Tinc, I -> D at ?,
+    # THREE scheduled non-infection events (E -> I at Tinc, I -> D at Tsign,
     # D -> R at Tdeath), so the melt produces three rows per individual. The
     # transition that is actually applied is decided from the individual's
     # status when its event is popped.
@@ -610,7 +586,6 @@ modelSEIDR <- function(epop, simParam = NULL) {
     # Start epidemic simulation loop ----
     epi_time <- 0.0
     while (.get_seidr_infectives(X) > 0L) {
-      if (DEBUG) message("time = ", epi_time)
 
       # Calculate infection rates in each group ----
       # Both "I" and "D" individuals are infectious; "E" individuals are not.
@@ -626,20 +601,14 @@ modelSEIDR <- function(epop, simParam = NULL) {
 
       if (is.na(t_next_event)) t_next_event <- Inf
 
-      if (DEBUG) message("Next NI event id = ", id_next_event, " at t = ",
-                         t_next_event)
-
       # generate random timestep ----
       total_inf_rate <- sum(X$inf_rate)
 
       # calculate dt if infections event rate > 0
       dt <- rexp(1L) / total_inf_rate
 
-      if (DEBUG) message("Total infections event rate = ", total_inf_rate)
-
       # check if next event is infection or non-infection ----
       if (epi_time + dt < t_next_event) {
-        if (DEBUG) message("next event is infection at t = ", epi_time)
 
         epi_time <- epi_time + dt
 
@@ -654,10 +623,11 @@ modelSEIDR <- function(epop, simParam = NULL) {
 
         seidr_path <- .generate_seidr_path(epi_time, X, id_next_event, simParam)
 
-        data.table::set(X, id_next_event,
-            c("status", "Tinf", "Tinc", "Tsign", "Tdeath",
-              "generation", "infected_by"),
-            c("E", epi_time, as.list(seidr_path), next_gen, infd_by))
+        data.table::set(
+          X, id_next_event,
+          c("status", "Tinf", "Tinc", "Tsign", "Tdeath", "generation",
+            "infected_by"),
+          c("E", epi_time, as.list(seidr_path), next_gen, infd_by))
 
         # Update this individual's three queued events. seidr_path has length 3
         # and matches the three rows for this individual; the assignment order
@@ -665,11 +635,7 @@ modelSEIDR <- function(epop, simParam = NULL) {
         # resolved by status when popped.
         ni_events[I == id_next_event, time := seidr_path]
 
-        if (DEBUG) message("ID ", id_next_event,
-                           ": S -> E, infected by ID ", infd_by)
       } else {
-        if (DEBUG) message("next event is non-infection at t = ",
-                           t_next_event)
 
         epi_time <- t_next_event
 
@@ -678,13 +644,10 @@ modelSEIDR <- function(epop, simParam = NULL) {
         status <- X$status[[id_next_event]]
 
         if (status == "E") {
-          if (DEBUG) message("ID ", id_next_event, ": E -> I")
           data.table::set(X, id_next_event, "status", "I")
         } else if (status == "I") {
-          if (DEBUG) message("ID ", id_next_event, ": I -> D")
           data.table::set(X, id_next_event, "status", "D")
         } else if (status == "D") {
-          if (DEBUG) message("ID ", id_next_event, ": D -> R")
           data.table::set(X, id_next_event, "status", "R")
         } else {
           message("status = ", status)
@@ -699,10 +662,6 @@ modelSEIDR <- function(epop, simParam = NULL) {
 
       data.table::setorder(ni_events, time, na.last = TRUE)
 
-      if (DEBUG == 2) {
-        print(X[, .(group, indCases, status, Tinf, Tinc, Tsign, Tdeath,
-                    group_inf, inf_rate)])
-      }
     }
     X
   }) |> rbindlist()
@@ -713,6 +672,10 @@ modelSEIDR <- function(epop, simParam = NULL) {
   # remove iid though
   Y[, iid := NULL]
 
+  # and the phenotypes
+  Y[,colnames(epop@pheno) := NULL]
+
+  # also these two columns are no longer needed
   Y[, c("group_inf", "inf_rate") := NULL]
 
   final_t <- max(Y$Tdeath, na.rm = TRUE)

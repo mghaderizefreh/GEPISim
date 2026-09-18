@@ -4,7 +4,7 @@
 \alias{plot_SEIR}
 \title{Plot Model time series for SEIR}
 \usage{
-plot_SEIR(ePop, simParam)
+plot_SEIR(ePop, simParam, trim)
 }
 \arguments{
 \item{ePop}{an \code{\link{PopEpidemic-class}} object}

@@ -1,7 +1,7 @@
 Package: GEPISim
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.1.0
+Version: 0.11.4.9000
 Date: 2026-04-15
 Authors@R: c(
     person("Masoud", "Ghaderi Zefreh", role = c("aut", "cre"), 
@@ -12,8 +12,8 @@ Description: More about what it does (maybe more than one line).
     Continuation lines should be indented.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Depends: R (>= 4.1.0)
-Imports: methods, data.table, AlphaSimR, R6, purrr
+Depends: R (>= 4.1.0), AlphaSimR
+Imports: methods, data.table, R6, purrr
 Suggests: 
     testthat (>= 3.0.0),
     knitr,

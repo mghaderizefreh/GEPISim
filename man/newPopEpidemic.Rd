@@ -2,7 +2,7 @@
 % Please edit documentation in R/Class-PopEpidemic.R
 \name{newPopEpidemic}
 \alias{newPopEpidemic}
-\title{Create a new population with epidemy (PopEpidemic)}
+\title{Create a new population with epidemic (PopEpidemic)}
 \usage{
 newPopEpidemic(
   rawPop,
@@ -18,7 +18,7 @@ newPopEpidemic(
 \code{\link[AlphaSimR:NamedMapPop-class]{NamedMapPop}}}
 
 \item{group_list}{list of groups for the population. Each group is a separate
-epidemy. If NULL it is assumed there is only one group}
+epidemic. If NULL it is assumed there is only one group}
 
 \item{indCases}{list of 0s and 1s indicating susceptible and first infected
 individuals, respectively. If any other number is passed this will cause
@@ -50,7 +50,9 @@ founderPop = quickHaplo(nInd=2, nChr=1, segSites=10)
 
 #Set simulation parameters
 SP = SimParamEpidemic$new(founderPop, model = "SIR")
-SP$addTraitA(var = c(1,1,1))
+means <- rep(0, nchar(SP$model))
+vars <- rep(1, nchar(SP$model))
+SP$addTraitA(10, mean = means, var = vars, names = c("sus","inf","tol"))
 
 #Create population
 pop = newPopEpidemic(founderPop)

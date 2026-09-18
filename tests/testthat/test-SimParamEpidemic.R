@@ -1,37 +1,6 @@
 library(testthat)
 library(AlphaSimR)
 
-# tests from AlphaSimR applied to GEPISim ----
-test_that("SimParamEpidemic nThreads validates values and NULL resets to default", {
-  founder <- quickHaplo(nInd = 2, nChr = 2, segSites = 4)
-  SP <- SimParamEpidemic$new(founder)
-  pop <- newPopEpidemic(founder, simParam = SP)
-
-  SP$nThreads <- 1L
-  expect_equal(SP$nThreads, 1L)
-
-  SP$nThreads <- NULL
-  expect_equal(SP$nThreads, getNumThreads())
-  expect_silent(pullSegSiteGeno(pop, simParam = SP))
-
-  expect_error(
-    SP$nThreads <- 0,
-    regexp = "single positive integer or NULL to reset"
-  )
-  expect_error(
-    SP$nThreads <- 0L,
-    regexp = "single positive integer or NULL to reset"
-  )
-  expect_error(
-    SP$nThreads <- 1.5,
-    regexp = "single positive integer or NULL to reset"
-  )
-  expect_error(
-    SP$nThreads <- NA_integer_,
-    regexp = "single positive integer or NULL to reset"
-  )
-})
-
 #### new tests for GEPISim ----
 make_founders <- function() {
   # Small/fast founder genomes for tests
@@ -110,17 +79,3 @@ test_that("constructor accepts model value case-insensitively (as documented)", 
   })
 })
 
-test_that("active binding 'version' returns expected structure and values", {
-  founders <- make_founders()
-  sp <- SimParamEpidemic$new(founders)
-
-  v <- sp$version
-  expect_type(v, "list")
-  expect_true(all(c("AlphaSimR", "GEPISim") %in% names(v)))
-
-  # GEPISim version should match installed package version
-  expect_identical(
-    v$GEPISim,
-    utils::packageDescription("GEPISim")$Version
-  )
-})

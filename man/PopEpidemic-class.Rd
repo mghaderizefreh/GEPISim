@@ -22,7 +22,7 @@ asPopEpidemic(from, group_list = NULL, indCases = NULL, simParam = NULL)
 \item{from}{source object (Pop-class)}
 
 \item{group_list}{list of groups for the population. Each group is a separate
-epidemy. If NULL it is assumed there is only one group}
+epidemic. If NULL it is assumed there is only one group}
 
 \item{indCases}{list of 0s and 1s indicating susceptible and index cases,
 respectively. If any other number is passed this will cause an error. If
@@ -50,9 +50,9 @@ index cases.
 }
 \section{Functions}{
 \itemize{
-\item \code{show(PopEpidemic)}: Show epidemy population summary
+\item \code{show(PopEpidemic)}: Show epidemic population summary
 
-\item \code{initDynamics()}: initialises the dynamic object
+\item \code{initDynamics()}: initialises the \code{dynamics} data.table
 
 \item \code{asPopEpidemic()}: coerces into PopEpidemic-class from Pop-class
 

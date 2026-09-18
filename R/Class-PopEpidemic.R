@@ -22,7 +22,7 @@ setClass("PopEpidemic",
          slots=c(dynamics = 'ANY'),
          contains="Pop")
 
-#' @title Create a new population with epidemy (PopEpidemic)
+#' @title Create a new population with epidemic (PopEpidemic)
 #'
 #' @description
 #' Creates an initial \code{\link{PopEpidemic-class}} from an object of
@@ -35,7 +35,7 @@ setClass("PopEpidemic",
 #' @param rawPop an object of \code{\link[AlphaSimR:MapPop-class]{MapPop}} or
 #' \code{\link[AlphaSimR:NamedMapPop-class]{NamedMapPop}}
 #' @param group_list list of groups for the population. Each group is a separate
-#'   epidemy. If NULL it is assumed there is only one group
+#'   epidemic. If NULL it is assumed there is only one group
 #' @param indCases list of 0s and 1s indicating susceptible and first infected
 #'   individuals, respectively. If any other number is passed this will cause
 #'   an error. If NULL, it is assumed there is one index case per group.
@@ -57,7 +57,9 @@ setClass("PopEpidemic",
 #'
 #' #Set simulation parameters
 #' SP = SimParamEpidemic$new(founderPop, model = "SIR")
-#' SP$addTraitA(var = c(1,1,1))
+#' means <- rep(0, nchar(SP$model))
+#' vars <- rep(1, nchar(SP$model))
+#' SP$addTraitA(10, mean = means, var = vars, names = c("sus","inf","tol"))
 #'
 #' #Create population
 #' pop = newPopEpidemic(founderPop)
@@ -73,7 +75,7 @@ newPopEpidemic <- function(rawPop, group_list = NULL, indCases = NULL,
                 indCases = indCases)
 }
 
-#' @describeIn PopEpidemic-class Show epidemy population summary
+#' @describeIn PopEpidemic-class Show epidemic population summary
 #' @export
 setMethod("show",
           signature(object = "PopEpidemic"),
@@ -87,7 +89,7 @@ setMethod("show",
           }
 )
 
-#' @describeIn PopEpidemic-class initialises the dynamic object
+#' @describeIn PopEpidemic-class initialises the `dynamics` data.table
 #' @md
 #' @param ePop an \code{\link{PopEpidemic-class}} object
 #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
@@ -138,7 +140,7 @@ initDynamics <- function(ePop, simParam=NULL){
 #' @describeIn PopEpidemic-class coerces into PopEpidemic-class from Pop-class
 #' @param from source object (Pop-class)
 #' @param group_list list of groups for the population. Each group is a separate
-#'   epidemy. If NULL it is assumed there is only one group
+#'   epidemic. If NULL it is assumed there is only one group
 #' @param indCases list of 0s and 1s indicating susceptible and index cases,
 #'   respectively. If any other number is passed this will cause an error. If
 #'   NULL, it is assumed there is one index case per group.

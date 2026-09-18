@@ -28,7 +28,8 @@ test_that("newPopEpidemic basic construction and defaults work", {
     for (tcol in SP$timings) {
       expect_true(all(is.na(ep@dynamics[[tcol]])))
       # NAs should be of real type
-      expect_true(is.double(ep@dynamics[[tcol]]) || all(is.na(ep@dynamics[[tcol]])))
+      expect_true(is.double(ep@dynamics[[tcol]]) ||
+                    all(is.na(ep@dynamics[[tcol]])))
     }
   }
 
@@ -38,11 +39,6 @@ test_that("newPopEpidemic basic construction and defaults work", {
 
   # Status factor levels and initial value
   expect_identical(levels(ep@dynamics$status), unique(strsplit("SIR", "")[[1]]))
-
-  # TODO: This actually should not be true as the indCases is not susceptible
-  #       but may depend on the model if the model is infectious only or also
-  #       diseased as well. Need to confirm with Jamie or see his code
-  #  expect_true(all(as.character(ep@dynamics$status) == "S"))
 
   # group_inf default
   expect_true(all(ep@dynamics$group_inf == 0))
@@ -60,7 +56,8 @@ test_that("newPopEpidemic honors provided group_list and indCases", {
 
   founderPop <- AlphaSimR::quickHaplo(nInd = 5, nChr = 1, segSites = 50)
   SP <- SimParamEpidemic$new(founderPop, model = "SIR")
-  SP$addTraitA(nQtlPerChr = 5)
+  SP$addTraitA(nQtlPerChr = 5, mean = c(0,0,0), var = c(1,1,1),
+               cor = diag(c(1,1,1)), name = c('sus', 'inf', 'tol'))
 
   group_list <- c(1, 1, 2, 2, 2)
   indCases <- c(1, 0, 0, 1, 0)

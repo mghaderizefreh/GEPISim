@@ -4,17 +4,17 @@
 \alias{modelSEIR}
 \title{modelSEIR}
 \usage{
-modelSEIR(epop, simParam = NULL)
+modelSEIR(epop, simParam)
 }
 \arguments{
-\item{epop}{A population with an epidemy, an object of class
+\item{epop}{A population with an epidemic, an object of class
 \code{\link{PopEpidemic-class}}}
 
 \item{simParam}{a \code{\link{SimParamEpidemic}} object}
 }
 \value{
 Returns the same input object of type \code{\link{PopEpidemic-class}}
- with the \code{dynamic} field populated with evolution of the epidemy
+ with the \code{dynamics} field populated with evolution of the epidemic
 }
 \description{
 Compartmental model SEIR - Susceptible, Exposed, Infectious, Recovered

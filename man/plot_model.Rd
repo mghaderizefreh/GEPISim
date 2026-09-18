@@ -4,12 +4,15 @@
 \alias{plot_model}
 \title{Plot Model time series}
 \usage{
-plot_model(ePop, simParam)
+plot_model(ePop, simParam, trim = 0.95)
 }
 \arguments{
 \item{ePop}{an \code{\link{PopEpidemic-class}} object}
 
 \item{simParam}{simulation parameter of type \code{\link{SimParamEpidemic}}}
+
+\item{trim}{The percentage of x-axis data to be kept. If the whole x-axis is
+shown then it will be difficult to see the early dynamics.}
 }
 \value{
 A plot of the epidemic
