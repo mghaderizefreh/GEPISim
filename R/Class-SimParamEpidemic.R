@@ -31,52 +31,17 @@ SimParamEpidemic <- R6::R6Class(
     #'   infectious state before they are removed.
     removal_period = NA_real_,
 
-    # RP_shape field ----
-    #' @field RP_shape
-    #' This is the shape of the gamma distribution for survival. A value of 1
-    #' gives an exponential distribution. When RP_shape > 1, it indicates that
-    #' hazard generally increases with time (removal becomes more likely the
-    #' longer infection lasts). This is common for many disease processes where
-    #' risk of recovery/death rises after some days.
-    RP_shape = NA_real_,
-
-    # RP_scale field ----
-    #' @field RP_scale This is not user defined but calculated as
-    #'  ` RP_scale = removal_period / RP_shape `
-    RP_scale = NA_real_,
-
     # detection_period field ----
     #' @field detection_period the mean time an individual stays undetected in
     #'   the "I" state before moving to the detected "D" state. Only consumed by
     #'   models with a "D" compartment (e.g. SIDR).
     detection_period = NA_real_,
 
-    # DP_shape field ----
-    #' @field DP_shape shape of the gamma distribution for the detection period.
-    #'   A value of 1 gives an exponential distribution.
-    DP_shape = NA_real_,
-
-    # DP_scale field ----
-    #' @field DP_scale not user defined but calculated as
-    #'  ` DP_scale = detection_period / DP_shape `
-    DP_scale = NA_real_,
-
     # latent_period field ----
     #' @field latent_period the mean time an individual stays in the exposed
     #'   "E" (latent, non-infectious) state before becoming infectious "I".
     #'   Only consumed by models with an "E" compartment (e.g. SEIR).
     latent_period = NA_real_,
-
-    # LP_shape field ----
-    #' @field LP_shape shape of the gamma distribution for the latent period.
-    #'   A value of 1 gives an exponential distribution.
-    LP_shape = NA_real_,
-
-    # LP_scale field ----
-    #' @field LP_scale not user defined but calculated as
-    #'  ` LP_scale = latent_period / LP_shape `
-    LP_scale = NA_real_,
-
 
     # compartment field ----
     #' @field compartments list of compartment (e.g., "S","I","R" for SIR)
@@ -111,20 +76,11 @@ SimParamEpidemic <- R6::R6Class(
     #' @param removal_period see \code{\link[GEPISim]{SimParamEpidemic}}
     #'   field \code{removal_period}
     #'
-    #' @param RP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
-    #'   \code{RP_shape}
-    #'
     #' @param detection_period \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{detection_period}
     #'
-    #' @param DP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
-    #'   \code{DP_shape}
-    #'
     #' @param latent_period \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{latent_period}
-    #'
-    #' @param LP_shape \code{\link[GEPISim]{SimParamEpidemic}} field
-    #'   \code{LP_shape}
     #'
     #' @examples
     #' founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
@@ -137,11 +93,8 @@ SimParamEpidemic <- R6::R6Class(
                           model = "SIR",
                           r_beta = 0.5,
                           removal_period = 10,
-                          RP_shape = 1,
                           detection_period = 10,
-                          DP_shape = 1,
-                          latent_period = 10,
-                          LP_shape = 1){
+                          latent_period = 10){
 
       model <- toupper(model)
       stopifnot("provided model is not valid" = model %in% private$.validModels)
@@ -153,18 +106,12 @@ SimParamEpidemic <- R6::R6Class(
 
       # removal (or recovery) period - from I (or D if it exists) to R
       self$removal_period = removal_period
-      self$RP_shape <- RP_shape
-      self$RP_scale <- removal_period / RP_shape
 
       # detection period (used by D-models such as SIDR)
       self$detection_period <- detection_period
-      self$DP_shape <- DP_shape
-      self$DP_scale <- detection_period / DP_shape
 
       # latent period (used by E-models such as SEIR)
       self$latent_period <- latent_period
-      self$LP_shape <- LP_shape
-      self$LP_scale <- latent_period / LP_shape
 
       self$compartments <- strsplit(model, split = "")[[1]] |> unique() |>
         as.list()

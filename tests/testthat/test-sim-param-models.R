@@ -34,25 +34,6 @@ test_that ("all supported models configure compartments, traits, and timings", {
   }
 })
 
-test_that("all period scales are derived from their matching period and shape", {
-  founders <- AlphaSimR::quickHaplo(nInd = 4, nChr = 1, segSites = 10)
-
-  sp <- SimParamEpidemic$new(
-    founders,
-    model = "SEIDR",
-    removal_period = 12,
-    RP_shape = 3,
-    detection_period = 8,
-    DP_shape = 2,
-    latent_period = 15,
-    LP_shape = 5
-  )
-
-  expect_identical(sp$RP_scale, 4)
-  expect_identical(sp$DP_scale, 4)
-  expect_identical(sp$LP_scale, 3)
-})
-
 test_that("version is a read-only active field", {
   founders <- AlphaSimR::quickHaplo(nInd = 4, nChr = 1, segSites = 10)
   sp <- SimParamEpidemic$new(founders)

@@ -14,7 +14,7 @@
 - [ ] Include two vignettes
 - [x] Include implicit conversion in `run` -> a warning message is produced instead
     - [x] Rename `run` to `runEpidemic`
-- [ ] Convert rates (removal, latency, detection) to constant values and remove all distribution-implementation (following discussion with Andrea on Sep 4th)
+- [x] Convert rates (removal, latency, detection) to constant values and remove all distribution-implementation (following discussion with Andrea on Sep 4th)
 - [x] add versions
 - [ ] other plots
 

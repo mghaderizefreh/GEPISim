@@ -41,34 +41,13 @@ SIR,}
 \item{\code{removal_period}}{the mean time an individual remains in the "I" or
 infectious state before they are removed.}
 
-\item{\code{RP_shape}}{This is the shape of the gamma distribution for survival. A value of 1
-gives an exponential distribution. When RP_shape > 1, it indicates that
-hazard generally increases with time (removal becomes more likely the
-longer infection lasts). This is common for many disease processes where
-risk of recovery/death rises after some days.}
-
-\item{\code{RP_scale}}{This is not user defined but calculated as
-` RP_scale = removal_period / RP_shape `}
-
 \item{\code{detection_period}}{the mean time an individual stays undetected in
 the "I" state before moving to the detected "D" state. Only consumed by
 models with a "D" compartment (e.g. SIDR).}
 
-\item{\code{DP_shape}}{shape of the gamma distribution for the detection period.
-A value of 1 gives an exponential distribution.}
-
-\item{\code{DP_scale}}{not user defined but calculated as
-` DP_scale = detection_period / DP_shape `}
-
 \item{\code{latent_period}}{the mean time an individual stays in the exposed
 "E" (latent, non-infectious) state before becoming infectious "I".
 Only consumed by models with an "E" compartment (e.g. SEIR).}
-
-\item{\code{LP_shape}}{shape of the gamma distribution for the latent period.
-A value of 1 gives an exponential distribution.}
-
-\item{\code{LP_scale}}{not user defined but calculated as
-` LP_scale = latent_period / LP_shape `}
 
 \item{\code{compartments}}{list of compartment (e.g., "S","I","R" for SIR)
 This is a list of one-letter characters determined by the model used}
@@ -149,11 +128,8 @@ Starts the process of building a new simulation by creating
   model = "SIR",
   r_beta = 0.5,
   removal_period = 10,
-  RP_shape = 1,
   detection_period = 10,
-  DP_shape = 1,
-  latent_period = 10,
-  LP_shape = 1
+  latent_period = 10
 )}\if{html}{\out{</div>}}
 }
 
@@ -172,20 +148,11 @@ Starts the process of building a new simulation by creating
 \item{\code{removal_period}}{see \code{\link[GEPISim]{SimParamEpidemic}}
 field \code{removal_period}}
 
-\item{\code{RP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
-\code{RP_shape}}
-
 \item{\code{detection_period}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{detection_period}}
 
-\item{\code{DP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
-\code{DP_shape}}
-
 \item{\code{latent_period}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{latent_period}}
-
-\item{\code{LP_shape}}{\code{\link[GEPISim]{SimParamEpidemic}} field
-\code{LP_shape}}
 }
 \if{html}{\out{</div>}}
 }

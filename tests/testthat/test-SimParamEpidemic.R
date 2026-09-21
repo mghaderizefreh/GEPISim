@@ -14,8 +14,6 @@ test_that("constructor sets default arguments correctly", {
   expect_identical(sp$model, "SIR")
   expect_identical(sp$removal_period, 10)
   expect_identical(sp$r_beta, 0.5)
-  expect_identical(sp$RP_shape, 1)
-  expect_identical(sp$RP_scale, 10)  # removal_period / RP_shape
 
   # Model-dependent defaults for SIR
   expect_identical(sp$epi_traits, c(s = "sus", i = "inf", t = "tol"))
@@ -33,15 +31,12 @@ test_that("constructor sets custom arguments correctly", {
     founders,
     model = model,
     removal_period = removal_period,
-    r_beta = r_beta,
-    RP_shape = RP_shape
+    r_beta = r_beta
   )
 
   expect_identical(sp$model, model)
   expect_identical(sp$removal_period, removal_period)
   expect_identical(sp$r_beta, r_beta)
-  expect_identical(sp$RP_shape, RP_shape)
-  expect_identical(sp$RP_scale, removal_period / RP_shape)
 })
 
 test_that("constructor rejects invalid model values", {

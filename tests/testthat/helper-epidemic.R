@@ -16,11 +16,8 @@ make_test_epidemic <- function(model = "SIR",
     model = model,
     r_beta = r_beta,
     removal_period = 2,
-    RP_shape = 1,
     detection_period = 2,
-    DP_shape = 1,
-    latent_period = 2,
-    LP_shape = 1
+    latent_period = 2
   )
 
   trait_names <- unname(sp$epi_traits)
