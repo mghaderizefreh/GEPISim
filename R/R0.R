@@ -8,9 +8,7 @@
 #'
 #' @returns R0 as the basic reproductive ratio
 #' @export
-get_R0 <- function(ePop, simParam = NULL, method = 1) {
-  stopifnot("Unknown method passed. Must be 1 or 2" = method%in%c(1,2))
-
+get_R0 <- function(ePop, simParam = NULL) {
   if(is.null(simParam)){
     simParam = get("SP",envir=.GlobalEnv)
   }
@@ -25,12 +23,12 @@ get_R0 <- function(ePop, simParam = NULL, method = 1) {
           ePop@pheno[i, 'inf'] *
           simParam$removal_period * ePop@pheno[i, 'tol']
       ), numeric(1))
-    return(median(R0))
+    return(median(R0s))
   } else if (simParam$model %in%  c("SIDR", "SEIDR")){
     R0s <- vapply(
       1:ePop@nInd,
       \(i) (
-        simParm@r_beta *
+        simParam$r_beta *
           mean(ePop@pheno[-i, 'sus']) *
           ePop@pheno[i, 'inf'] *
           (
@@ -38,7 +36,7 @@ get_R0 <- function(ePop, simParam = NULL, method = 1) {
               simParam$detection_period * ePop@pheno[i, 'det']
           )
       ), numeric(1))
-    return(median(R0))
+    return(median(R0s))
   } else{
     # not-handled model
     warning(paste("Modle", simParam$model,"is not allowed"))

@@ -11,9 +11,4 @@ Currently in development
 \author{
 \strong{Maintainer}: Masoud Ghaderi Zefreh \email{mghaderi@ed.ac.uk} (\href{https://orcid.org/0000-0002-7656-2718}{ORCID})
 
-Authors:
-\itemize{
-  \item Masoud Ghaderi Zefreh \email{mghaderi@ed.ac.uk} (\href{https://orcid.org/0000-0002-7656-2718}{ORCID})
-}
-
 }

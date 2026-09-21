@@ -13,16 +13,19 @@
 #' founderPop <- quickHaplo(nInd = 10, nChr = 1, segSites = 10)
 #'
 #' # Set simulation parameters
-#' SP = SimParamEpidemic$new(founderPop, model = "SIR")
+#' SP <- SimParamEpidemic$new(founderPop, model = "SIR")
 #' means <- rep(0, nchar(SP$model))
 #' vars <- rep(1, nchar(SP$model))
-#' SP$addTraitA(10, mean = means, var = vars, names = c("sus","inf","tol"))
+#' SP$addTraitA(10, mean = means, var = vars, name = c("sus","inf","tol"))
 #'
 #' # Create population assuming one random index case
-#' pop = newPopEpidemic(founderPop, indexCases = sample(founderPop@nInd, 1))
+#' pop <- newPopEpidemic(founderPop)
+#'
+#' # set phenotypes
+#' pop <- setPheno(pop, h2 = c(0.3, 0.4, 0.2))
 #'
 #' # Run Epidemic
-#' pop = run(pop)
+#' pop <- runEpidemic(pop)
 #'
 #' @export
 runEpidemic <- function(epop,simParam=NULL){
@@ -30,19 +33,13 @@ runEpidemic <- function(epop,simParam=NULL){
   if (!is(epop, "PopEpidemic") & is(epop, "Pop")){
     warning("epop is a Pop object. Use the function asPopEpidemic to convert it.")
   }
+  
+  if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
+  
   stopifnot("simParam must be a SimParamEpidemic object"=
               is(simParam, "SimParamEpidemic"),
             "epop must be a PopEpidemic object."=
               is(epop, "PopEpidemic"))
-
-  if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
-
-  # Check if we indeed have the phenotypes we need
-  for (epitrait in simParam$epi_traits){
-    if (!epitrait %in% colnames(epop@pheno)) {
-      stop('"',epitrait, "\" is not defined as a phenotype")
-    }
-  }
 
   f <- get(paste0("model",toupper(simParam$model)))
   f(epop, simParam)

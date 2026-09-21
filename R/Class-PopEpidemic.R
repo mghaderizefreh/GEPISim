@@ -59,7 +59,7 @@ setClass("PopEpidemic",
 #' SP = SimParamEpidemic$new(founderPop, model = "SIR")
 #' means <- rep(0, nchar(SP$model))
 #' vars <- rep(1, nchar(SP$model))
-#' SP$addTraitA(10, mean = means, var = vars, names = c("sus","inf","tol"))
+#' SP$addTraitA(10, mean = means, var = vars, name = c("sus","inf","tol"))
 #'
 #' #Create population
 #' pop = newPopEpidemic(founderPop)
@@ -179,6 +179,13 @@ asPopEpidemic <- function(from, group_list = NULL, indCases = NULL,
   for(g in unique(group_list)){
     if(sum(indCases[group_list == g] == 1) < 1){
       stop(sprintf("Each group must have at least one case"))
+    }
+  }
+  
+  # check traits, i.e., if we indeed have the phenotypes we need
+  for (epitrait in simParam$epi_traits){
+    if (!epitrait %in% colnames(from@pheno)) {
+      stop('"',epitrait, "\" is not defined as a phenotype")
     }
   }
 

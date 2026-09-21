@@ -4,7 +4,7 @@
 \alias{get_R0}
 \title{Get R0}
 \usage{
-get_R0(ePop, simParam = NULL, method = 1)
+get_R0(ePop, simParam = NULL)
 }
 \arguments{
 \item{ePop}{A \code{\link{PopEpidemic-class}} object with infection

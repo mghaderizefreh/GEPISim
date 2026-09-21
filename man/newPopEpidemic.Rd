@@ -52,7 +52,7 @@ founderPop = quickHaplo(nInd=2, nChr=1, segSites=10)
 SP = SimParamEpidemic$new(founderPop, model = "SIR")
 means <- rep(0, nchar(SP$model))
 vars <- rep(1, nchar(SP$model))
-SP$addTraitA(10, mean = means, var = vars, names = c("sus","inf","tol"))
+SP$addTraitA(10, mean = means, var = vars, name = c("sus","inf","tol"))
 
 #Create population
 pop = newPopEpidemic(founderPop)

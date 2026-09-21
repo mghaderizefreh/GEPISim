@@ -16,6 +16,7 @@
     - [x] Rename `run` to `runEpidemic`
 - [ ] Convert rates (removal, latency, detection) to constant values and remove all distribution-implementation (following discussion with Andrea on Sep 4th)
 - [x] add versions
+- [ ] other plots
 
 ## Medium Priority
 - [ ] SIS
@@ -35,7 +36,7 @@
         - [ ] SEIDR
     - [ ] other
 - [x] Include `addEpiTrait2` for "other" functions in AlphaSimR that don't start with `add` - NO LONGER NEEDED
-- [ ] Add unit tests
+- [x] Add unit tests
 - [ ] Add fixed effect
 
 ## Low Priority

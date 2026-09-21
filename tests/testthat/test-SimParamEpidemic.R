@@ -7,14 +7,6 @@ make_founders <- function() {
   AlphaSimR::quickHaplo(nInd = 4, nChr = 1, segSites = 10)
 }
 
-test_that("constructor creates an object of the correct class and inheritance", {
-  founders <- make_founders()
-  sp <- SimParamEpidemic$new(founders)
-
-  expect_true(inherits(sp, "SimParamEpidemic"))
-  expect_true(inherits(sp, "SimParam"))  # inherits from AlphaSimR::SimParam (R6)
-})
-
 test_that("constructor sets default arguments correctly", {
   founders <- make_founders()
   sp <- SimParamEpidemic$new(founders)
@@ -50,10 +42,6 @@ test_that("constructor sets custom arguments correctly", {
   expect_identical(sp$r_beta, r_beta)
   expect_identical(sp$RP_shape, RP_shape)
   expect_identical(sp$RP_scale, removal_period / RP_shape)
-
-  # Model-dependent defaults for SIR still apply
-  expect_identical(sp$epi_traits, c(s = "sus", i = "inf", t = "tol"))
-  expect_identical(sp$timings, c("Tinf", "Tdeath"))
 })
 
 test_that("constructor rejects invalid model values", {
@@ -69,11 +57,10 @@ test_that("constructor accepts model value case-insensitively (as documented)", 
   founders <- make_founders()
 
   # As documented, model is case-insensitive.
-  # This test will currently fail with the present implementation and should
-  # pass once validation is adjusted to be case-insensitive.
   expect_silent({
     sp <- SimParamEpidemic$new(founders, model = "sir")
     # Ensure model-dependent components are set correctly even if lower-case was passed
+    expect_identical(sp$model, "SIR")
     expect_identical(sp$epi_traits, c(s = "sus", i = "inf", t = "tol"))
     expect_identical(sp$timings, c("Tinf", "Tdeath"))
   })

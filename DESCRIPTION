@@ -1,7 +1,7 @@
 Package: GEPISim
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.11.4.9000
+Version: 0.11.8.9000
 Date: 2026-04-15
 Authors@R: c(
     person("Masoud", "Ghaderi Zefreh", role = c("aut", "cre"), 
@@ -13,7 +13,7 @@ Description: More about what it does (maybe more than one line).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Depends: R (>= 4.1.0), AlphaSimR
-Imports: methods, data.table, R6, purrr
+Imports: methods, data.table, R6, purrr, ggplot2
 Suggests: 
     testthat (>= 3.0.0),
     knitr,
@@ -21,3 +21,4 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3
