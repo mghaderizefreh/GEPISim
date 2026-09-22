@@ -17,6 +17,7 @@
 - [x] Convert rates (removal, latency, detection) to constant values and remove all distribution-implementation (following discussion with Andrea on Sep 4th)
 - [x] add versions
 - [ ] other plots
+    - [x] km plot
 
 ## Medium Priority
 - [ ] SIS

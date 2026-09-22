@@ -7,15 +7,18 @@
 
 #' @returns A plot of the epidemic
 #' @export
-plot_model <- function(ePop, simParam, trim = 0.95) {
-  plt <- switch(simParam$model,
-                "SIS" = plot_SIS(ePop, simParam, trim),
-                "SIR" = plot_SIR(ePop, simParam, trim),
-                "SEIR" = plot_SEIR(ePop, simParam, trim),
-                "SIDR" = plot_SIDR(ePop, simParam, trim),
-                "SEIDR" = plot_SEIDR(ePop, simParam, trim))
-
-  plt
+plotModel <- function(ePop, simParam = NULL, trim = 0.95) {
+  
+  if(is.null(simParam)){
+    simParam = get("SP", envir=.GlobalEnv)
+  }
+  
+  switch(simParam$model,
+         "SIR" = plot_SIR(ePop, simParam, trim),
+         "SEIR" = plot_SEIR(ePop, simParam, trim),
+         "SIDR" = plot_SIDR(ePop, simParam, trim),
+         "SEIDR" = plot_SEIDR(ePop, simParam, trim))
+  #"SIS" = plot_SIS(ePop, simParam, trim),
 }
 
 #' Plot Model time series for SEIDR
@@ -141,10 +144,6 @@ plot_SIDR <- function(ePop, simParam, trim) {
       data.table::melt("time")
   }
 
-  if(is.null(simParam)){
-    simParam = get("SP", envir=.GlobalEnv)
-  }
-
   N <- ePop@nInd
 
   tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
@@ -170,6 +169,8 @@ plot_SIDR <- function(ePop, simParam, trim) {
 #'
 #' @param ePop an \code{\link{PopEpidemic-class}} object
 #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
+#' @param trim The percentage of x-axis data to be kept. If the whole x-axis is
+#'  shown then it will be difficult to see the early dynamics.
 #'
 #' @returns A plot of the epidemic
 plot_SEIR <- function(ePop, simParam, trim) {
@@ -211,11 +212,7 @@ plot_SEIR <- function(ePop, simParam, trim) {
           X[time > 0 & time <= tmax]) |>
       data.table::melt("time")
   }
-
-  if(is.null(simParam)){
-    simParam = get("SP",envir=.GlobalEnv)
-  }
-
+  
   N <- ePop@nInd
 
   tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
@@ -279,10 +276,6 @@ plot_SIR <- function(ePop, simParam, trim) {
       data.table::melt("time")
   }
 
-  if(is.null(simParam)){
-    simParam = get("SP",envir=.GlobalEnv)
-  }
-
   N <- ePop@nInd
 
   tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
@@ -302,33 +295,84 @@ plot_SIR <- function(ePop, simParam, trim) {
     ggplot2::theme_bw()
 }
 
-#' Plot Model time series for SIS
+# #' Plot Model time series for SIS
+# #'
+# #' @param ePop an \code{\link{PopEpidemic-class}} object
+# #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
+# #'
+# #' @returns A plot of the epidemic
+# plot_SIS <- function(ePop, simParam) {
+#   message("Plotting SIS model")
+# 
+#   N <- ePop[sdp == "progeny", .N]
+#   tmax <- simParam$tmax
+# 
+#  events <- make_time_series_sis(ePop, simParam)
+#
+#   ggplot(events) +
+#     aes(x = time,
+#         y = value / N,
+#         colour = variable) +
+#     geom_line(linewidth = 1.2) +
+#     scale_colour_manual("Compartments",
+#                         breaks = c("S", "I"),
+#                         labels = c("Susceptible", "Infectious"),
+#                         values = c("blue", "red")) +
+#     coord_cartesian(xlim = c(0, min(tmax, max(events$time), na.rm = TRUE)),
+#                     ylim = c(0, 1)) +
+#     labs(x = "Time (days)",
+#          y = "Proportion",
+#          title = "SIS model") +
+#    theme_bw()
+# }
+
+
+## ---- KM Plots -----
+#' KM plot
+#'
+#' Generate a basic KM plot for a population
 #'
 #' @param ePop an \code{\link{PopEpidemic-class}} object
 #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
-#'
-#' @returns A plot of the epidemic
-plot_SIS <- function(ePop, simParam) {
-  message("Plotting SIS model")
-
-  N <- ePop[sdp == "progeny", .N]
-  tmax <- simParam$tmax
-
-  events <- make_time_series_sis(ePop, simParam)
-
-  ggplot(events) +
-    aes(x = time,
-        y = value / N,
-        colour = variable) +
-    geom_line(linewidth = 1.2) +
-    scale_colour_manual("Compartments",
-                        breaks = c("S", "I"),
-                        labels = c("Susceptible", "Infectious"),
-                        values = c("blue", "red")) +
-    coord_cartesian(xlim = c(0, min(tmax, max(events$time), na.rm = TRUE)),
-                    ylim = c(0, 1)) +
-    labs(x = "Time (days)",
-         y = "Proportion",
-         title = "SIS model") +
-    theme_bw()
+#' #'
+#' @returns A KM plot
+#' @export
+plot_km <- function(ePop, simParam = NULL) {
+  if(is.null(simParam)) simParam = get("SP", envir=.GlobalEnv)
+  
+  popn <- ePop@dynamics
+  cols <- intersect(c("Tinf", "Tsign", "Tdeath"),
+                    names(popn))
+  
+  x <- popn[, ..cols]
+  x[, sire := ePop@father]
+  
+  if ("Tsign" %notin% names(x)) {
+    x[, Tsign := Tinf]
+  }
+  
+  x[, RP := Tdeath - Tsign]
+  
+  x1 <- x[, .(Tsign = c(0, sort(Tsign, na.last = TRUE)),
+              RP    = c(0, sort(RP,    na.last = TRUE))),
+          .(sire)]
+  x1[, grp := .GRP, .(sire)]
+  x1[, survival := seq(1, 0, length.out = .N), grp]
+  
+  x2 <- data.table::melt(x1, measure.vars = c("Tsign", "RP"),
+                         value.name = "time")
+  
+  plt <- ggplot2::ggplot(x2, ggplot2::aes(x = time, 
+                                          y = survival, group = grp)) +
+    ggplot2::geom_line(colour = "red") +
+    ggplot2::labs(x = "Time (days)",  y = "Survival") +
+    ggplot2::facet_grid(
+      cols = ggplot2::vars(variable), scales = "free_x",
+      labeller = ggplot2::labeller(
+        variable = c(Tinf  = "Proportion of family uninfected vs time",
+                     Tsign ="Proportion of family with no visual signs vs time",
+                     RP    = "Proportion of family surviving vs time"))) +
+    ggplot2::theme_bw()
+  
+  plt
 }
