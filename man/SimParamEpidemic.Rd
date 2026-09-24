@@ -49,6 +49,10 @@ models with a "D" compartment (e.g. SIDR).}
 "E" (latent, non-infectious) state before becoming infectious "I".
 Only consumed by models with an "E" compartment (e.g. SEIR).}
 
+\item{\code{t_final}}{final time for simulating. This is needed for SIS model, 
+though it can be relevant for other models. Default value is NULL which
+will be 20/gamma}
+
 \item{\code{compartments}}{list of compartment (e.g., "S","I","R" for SIR)
 This is a list of one-letter characters determined by the model used}
 
@@ -129,7 +133,8 @@ Starts the process of building a new simulation by creating
   r_beta = 0.5,
   removal_period = 10,
   detection_period = 10,
-  latent_period = 10
+  latent_period = 10,
+  t_final = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -153,6 +158,8 @@ field \code{removal_period}}
 
 \item{\code{latent_period}}{\code{\link[GEPISim]{SimParamEpidemic}} field
 \code{latent_period}}
+
+\item{\code{t_final}}{final time of simulation if epidemic does not stop}
 }
 \if{html}{\out{</div>}}
 }

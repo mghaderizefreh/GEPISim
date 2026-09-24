@@ -695,3 +695,156 @@ modelSEIDR <- function(epop, simParam) {
   epop@dynamics <- Y[]
   epop
 }
+
+
+#' @title modelSIS
+#' @description
+#' Compartmental model SIS - Susceptible, Infectious, Susceptible again
+#'
+#' @param epop A population with an epidemic, an object of class
+#' \code{\link{PopEpidemic-class}}
+#' @param simParam a \code{\link{SimParamEpidemic}} object
+#'
+#' @return Returns the same input object of type \code{\link{PopEpidemic-class}}
+#'  with the \code{dynamics} field populated with evolution of the epidemic
+modelSIS <- function(epop, simParam) {
+  
+  et <- simParam$epi_traits
+  
+  # A Susceptible individual's future disease trajectory is fixed at the point of
+  # exposure.
+  generate_sis_path <- function(epi_time, X, id, simParam) {
+    simParam$removal_period * X[[et['t']]][[id]] + epi_time
+    #for a variable removal_period, gamma distribution is needed - deprecated
+    #rgamma(1L, simParam$RP_shape,
+      #scale = simParam$RP_scale * X[[et['t']]][[id]]) + epi_time
+  }
+  
+  r_beta <- simParam$r_beta
+  t_end  <- simParam$t_final
+
+  X <- cbind(data.table::as.data.table(epop@pheno),
+             data.table::copy(epop@dynamics))
+
+  nax <- function(x, y) {
+    if (length(x) == 1 && is.na(x[[1]])) y else c(x, y)
+  }
+
+  X[, iid := epop@iid]
+
+  purrr::walk(X[, .I[indCases == 1L]], \(i) {
+    data.table::set(X, i, c("status", simParam$timings),
+                    c(simParam$compartments[[2]], 0.0,
+                      as.list(.generate_sir_path(0.0, X, i, simParam))))
+  })
+  
+  Xgroups <- X |> split(by = "group")
+  
+  Y <- map(Xgroups, \(X) {
+    
+    # This is unique to the SIS and SIRS models
+    X[, `:=`(Tinf = as.list(Tinf),
+             Tdeath = as.list(Tdeath),
+             generation = as.list(generation),
+             infected_by = as.list(infected_by))]
+    
+    # This is a priority queue for the next event
+    ni_events <- X[, .(.I, map_dbl(Tdeath, last))] |>
+      data.table::melt(id.vars = "I", variable.name = "event", 
+      value.name = "time") |>
+      data.table::setorder(time, na.last = TRUE)
+    ni_events[, event := NULL]
+    
+    # Start epidemic simulation loop
+    epi_time <- 0.0
+    while (epi_time < t_end && X[, sum(status == "I") > 0L]) {
+      
+      # Calculate infection rates in each group
+      # this is the sum of the log infectivitities
+      #X[, group_inf := r_beta * GE * mean(inf * (status == "I"))]
+      X[, group_inf := r_beta * mean(inf * (status == "I"))]
+      
+      # if S, infection at rate beta SI
+      X[, inf_rate := sus * group_inf * (status == "S")]
+      
+      # id and time of next non-infection event
+      t_next_event  <- ni_events$time[[1]]
+      id_next_event <- ni_events$I[[1]]
+      
+      # generate random timestep -
+      total_inf_rate <- sum(X$inf_rate)
+      
+      # calculate dt if infections event rate > 0
+      dt <- rexp(1L) / total_inf_rate
+      
+      # check if next event is infection or non-infection
+      if (epi_time + dt < t_next_event) {
+        
+        epi_time <- epi_time + dt
+        
+        # randomly select individual
+        id_next_event <- sample(nrow(X),
+                                size = 1L,
+                                prob = X$inf_rate)
+        
+        xi <- X[, sample(.N, 1L, prob = inf * (status == "I"))]
+        infd_by <- X$iid[[xi]]
+        next_gen <- X$generation[[xi]] + 1L
+        
+        sis_path <- generate_sis_path(epi_time, X, id_next_event, params)
+        
+        set(X, id_next_event,
+            c("status", "Tinf", "Tdeath", "generation", "infected_by"),
+            list("I",
+                 nax(X$Tinf[[id_next_event]], epi_time),
+                 nax(X$Tdeath[[id_next_event]], sis_path),
+                 nax(X$generation[[id_next_event]], next_gen),
+                 nax(X$infected_by[[id_next_event]], infd_by)))
+        
+        ni_events[I == id_next_event, time := sis_path]
+        
+      } else {
+        
+        epi_time <- t_next_event
+        
+        data.table::set(ni_events, 1L, "time", NA)
+        
+        status <- X[id_next_event, status]
+        
+        if (status == "I") {
+          data.table::set(X, id_next_event, "status", "S")
+        } else {
+          print(X[, .(group, donor, status, Tinf, Tdeath, group_inf, inf_rate)])
+          print(X[id_next_event, .(group, donor, status, Tinf, Tdeath, group_inf, inf_rate)])
+          stop(str_c("selected ID ", id_next_event, "... unexpected event!"))
+          break
+        }
+      }
+      
+      # Every event we set the order of the ni_events. This should be fast
+      # though as data.table uses a sensible sort method.
+      data.table::setorder(ni_events, time, na.last = TRUE)
+    }
+    X
+  }) |> rbindlist()
+  
+  final_t <- Y$Tdeath |> list_c() |> max(na.rm = TRUE) |> signif(5)
+  
+  message(str_glue("- Final t = {final_t}, values are:"),
+          str_flatten(capture.output(table(Y$status)), "\n"))
+  
+  Y <- Y[match(epop@iid, iid)]
+
+  # remove iid though
+  Y[, iid := NULL]
+  
+  # and the phenotypes
+  Y[,colnames(epop@pheno) := NULL]
+  
+  # also these two columns are no longer needed
+  Y[, c("group_inf", "inf_rate") := NULL]
+  
+  epop@dynamics <- Y[]
+  
+  return(epop)
+}

@@ -42,6 +42,12 @@ SimParamEpidemic <- R6::R6Class(
     #'   "E" (latent, non-infectious) state before becoming infectious "I".
     #'   Only consumed by models with an "E" compartment (e.g. SEIR).
     latent_period = NA_real_,
+    
+    # final time ----
+    #' @field t_final final time for simulating. This is needed for SIS model, 
+    #'  though it can be relevant for other models. Default value is NULL which
+    #'  will be 20/gamma
+    t_final = NA_real_,
 
     # compartment field ----
     #' @field compartments list of compartment (e.g., "S","I","R" for SIR)
@@ -81,6 +87,8 @@ SimParamEpidemic <- R6::R6Class(
     #'
     #' @param latent_period \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{latent_period}
+    #'   
+    #' @param t_final final time of simulation if epidemic does not stop
     #'
     #' @examples
     #' founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
@@ -94,7 +102,8 @@ SimParamEpidemic <- R6::R6Class(
                           r_beta = 0.5,
                           removal_period = 10,
                           detection_period = 10,
-                          latent_period = 10){
+                          latent_period = 10,
+                          t_final = NULL){
 
       model <- toupper(model)
       stopifnot("provided model is not valid" = model %in% private$.validModels)
@@ -112,6 +121,9 @@ SimParamEpidemic <- R6::R6Class(
 
       # latent period (used by E-models such as SEIR)
       self$latent_period <- latent_period
+      
+      # default value for t_final
+      self$t_final <- ifelse(is.null(t_final), 20*removal_period, t_final)
 
       self$compartments <- strsplit(model, split = "")[[1]] |> unique() |>
         as.list()
@@ -131,7 +143,7 @@ SimParamEpidemic <- R6::R6Class(
     #### Private ----
     .versionGEPISim = "character",
 
-    .validModels = c("SIR", "SIDR", "SEIR", "SEIDR"),# c("SI","SIS")
+    .validModels = c("SIR", "SIDR", "SEIR", "SEIDR", "SIS"),
 
 
     .all_traits = c(s = "sus", i = "inf", l = "lat", d = "det",
