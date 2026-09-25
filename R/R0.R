@@ -14,7 +14,7 @@ get_R0 <- function(ePop, simParam = NULL) {
   }
 
   # here we ignore the groups
-  if (simParam$model %in% c("SIR", "SEIR")){#
+  if (simParam$model %in% c("SIR", "SEIR", "SIS")){#
     R0s <- vapply(
       1:ePop@nInd,
       \(i) (

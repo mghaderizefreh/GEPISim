@@ -31,7 +31,7 @@
 runEpidemic <- function(epop,simParam=NULL){
   
   if (!is(epop, "PopEpidemic") & is(epop, "Pop")){
-    warning("epop is a Pop object. Use the function asPopEpidemic to convert it.")
+    warning("epop is a Pop object. Use `asPopEpidemic` to convert it.")
   }
   
   if(is.null(simParam)) simParam = get("SP",envir=.GlobalEnv)
@@ -550,7 +550,7 @@ modelSEIDR <- function(epop, simParam) {
     #              c(simParam$LP_shape, simParam$DP_shape, simParam$RP_shape),
     #              scale = c(simParam$LP_scale * X[[et['l']]][[id]],
     #                        simParam$DP_scale * X[[et['d']]][[id]],
-    #                        simParam$RP_scale * X[[et['t']]][[id]]))) + epi_time
+    #                        simParam$RP_scale * X[[et['t']]][[id]]))) +epi_time
     c(simParam$latent_period,simParam$detection_period,simParam$removal_period)*
       c(X[[et['l']]][[id]], X[[et['d']]][[id]],X[[et['t']]][[id]]) |> 
       cumsum() + epi_time
@@ -711,9 +711,9 @@ modelSIS <- function(epop, simParam) {
   
   et <- simParam$epi_traits
   
-  # A Susceptible individual's future disease trajectory is fixed at the point of
-  # exposure.
-  generate_sis_path <- function(epi_time, X, id, simParam) {
+  # A Susceptible individual's future disease trajectory is fixed at the point
+  # of exposure.
+  .generate_sis_path <- function(epi_time, X, id, simParam) {
     simParam$removal_period * X[[et['t']]][[id]] + epi_time
     #for a variable removal_period, gamma distribution is needed - deprecated
     #rgamma(1L, simParam$RP_shape,
@@ -735,12 +735,12 @@ modelSIS <- function(epop, simParam) {
   purrr::walk(X[, .I[indCases == 1L]], \(i) {
     data.table::set(X, i, c("status", simParam$timings),
                     c(simParam$compartments[[2]], 0.0,
-                      as.list(.generate_sir_path(0.0, X, i, simParam))))
+                      as.list(.generate_sis_path(0.0, X, i, simParam))))
   })
   
   Xgroups <- X |> split(by = "group")
   
-  Y <- map(Xgroups, \(X) {
+  Y <- purrr::map(Xgroups, \(X) {
     
     # This is unique to the SIS and SIRS models
     X[, `:=`(Tinf = as.list(Tinf),
@@ -749,7 +749,7 @@ modelSIS <- function(epop, simParam) {
              infected_by = as.list(infected_by))]
     
     # This is a priority queue for the next event
-    ni_events <- X[, .(.I, map_dbl(Tdeath, last))] |>
+    ni_events <- X[, .(.I, purrr::map_dbl(Tdeath, last))] |>
       data.table::melt(id.vars = "I", variable.name = "event", 
       value.name = "time") |>
       data.table::setorder(time, na.last = TRUE)
@@ -791,7 +791,7 @@ modelSIS <- function(epop, simParam) {
         infd_by <- X$iid[[xi]]
         next_gen <- X$generation[[xi]] + 1L
         
-        sis_path <- generate_sis_path(epi_time, X, id_next_event, params)
+        sis_path <- .generate_sis_path(epi_time, X, id_next_event, simParam)
         
         set(X, id_next_event,
             c("status", "Tinf", "Tdeath", "generation", "infected_by"),
@@ -815,7 +815,8 @@ modelSIS <- function(epop, simParam) {
           data.table::set(X, id_next_event, "status", "S")
         } else {
           print(X[, .(group, donor, status, Tinf, Tdeath, group_inf, inf_rate)])
-          print(X[id_next_event, .(group, donor, status, Tinf, Tdeath, group_inf, inf_rate)])
+          print(X[id_next_event, .(group, donor, status, Tinf, Tdeath, 
+                                   group_inf, inf_rate)])
           stop(str_c("selected ID ", id_next_event, "... unexpected event!"))
           break
         }
@@ -828,11 +829,11 @@ modelSIS <- function(epop, simParam) {
     X
   }) |> rbindlist()
   
-  final_t <- Y$Tdeath |> list_c() |> max(na.rm = TRUE) |> signif(5)
+  final_t <- Y$Tdeath |> purrr::list_c() |> max(na.rm = TRUE) |> signif(5)
   
-  message(str_glue("- Final t = {final_t}, values are:"),
-          str_flatten(capture.output(table(Y$status)), "\n"))
-  
+  message(sprintf("- Final t = %f, values are:", final_t),
+          paste(capture.output(table(Y$status)), collapse = ", "), "\n")
+
   Y <- Y[match(epop@iid, iid)]
 
   # remove iid though

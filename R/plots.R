@@ -15,10 +15,10 @@ plotModel <- function(ePop, simParam = NULL, trim = 0.95) {
   
   switch(simParam$model,
          "SIR" = plot_SIR(ePop, simParam, trim),
+         "SIS" = plot_SIS(ePop, simParam, trim),
          "SEIR" = plot_SEIR(ePop, simParam, trim),
          "SIDR" = plot_SIDR(ePop, simParam, trim),
          "SEIDR" = plot_SEIDR(ePop, simParam, trim))
-  #"SIS" = plot_SIS(ePop, simParam, trim),
 }
 
 #' Plot Model time series for SEIDR
@@ -52,7 +52,7 @@ plot_SEIDR <- function(ePop, simParam, trim) {
 
     X <- X[is.finite(time)]
 
-    setorder(X, time)
+    data.table::setorder(X, time)
     #                                                S    E    I    D    R
     X[event == "start",      (compartments) := list(+N,  +0L, +0L, +0L, +0L)]
     X[event == "infection",  (compartments) := list(-1L, +1L, +0L, +0L, +0L)]
@@ -124,7 +124,7 @@ plot_SIDR <- function(ePop, simParam, trim) {
 
     X <- X[is.finite(time)]
 
-    setorder(X, time)
+    data.table::setorder(X, time)
     #                                               S    I    D    R
     X[event == "start",     (compartments) := list(+N,  +0L, +0L, +0L)]
     X[event == "infection", (compartments) := list(-1L, +1L, +0L, +0L)]
@@ -194,7 +194,7 @@ plot_SEIR <- function(ePop, simParam, trim) {
 
     X <- X[is.finite(time)]
 
-    setorder(X, time)
+    data.table::setorder(X, time)
     #                                                S    E    I    R
     X[event == "start",      (compartments) := list(+N,  +0L, +0L, +0L)]
     X[event == "infection",  (compartments) := list(-1L, +1L, +0L, +0L)]
@@ -259,7 +259,7 @@ plot_SIR <- function(ePop, simParam, trim) {
 
     X <- X[is.finite(time)]
 
-    setorder(X, time)
+    data.table::setorder(X, time)
     #                                               S    I    R
     X[event == "start",     (compartments) := list(+N,  +0L, +0L)]
     X[event == "infection", (compartments) := list(-1L, +1L, +0L)]
@@ -295,36 +295,67 @@ plot_SIR <- function(ePop, simParam, trim) {
     ggplot2::theme_bw()
 }
 
-# #' Plot Model time series for SIS
-# #'
-# #' @param ePop an \code{\link{PopEpidemic-class}} object
-# #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
-# #'
-# #' @returns A plot of the epidemic
-# plot_SIS <- function(ePop, simParam) {
-#   message("Plotting SIS model")
-# 
-#   N <- ePop[sdp == "progeny", .N]
-#   tmax <- simParam$tmax
-# 
-#  events <- make_time_series_sis(ePop, simParam)
-#
-#   ggplot(events) +
-#     aes(x = time,
-#         y = value / N,
-#         colour = variable) +
-#     geom_line(linewidth = 1.2) +
-#     scale_colour_manual("Compartments",
-#                         breaks = c("S", "I"),
-#                         labels = c("Susceptible", "Infectious"),
-#                         values = c("blue", "red")) +
-#     coord_cartesian(xlim = c(0, min(tmax, max(events$time), na.rm = TRUE)),
-#                     ylim = c(0, 1)) +
-#     labs(x = "Time (days)",
-#          y = "Proportion",
-#          title = "SIS model") +
-#    theme_bw()
-# }
+#' Plot Model time series for SIS
+#'
+#' @param ePop an \code{\link{PopEpidemic-class}} object
+#' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
+#'
+#' @returns A plot of the epidemic
+plot_SIS <- function(ePop, simParam, trim) {
+  make_time_series_sis <- function(popn, params, tmax = tmax) {
+    compartments <- simParam$compartments |> unlist() |> unique()
+    
+    tmax <- popn[, purrr::map_dbl(Tdeath, last) |> 
+                   max(na.rm = TRUE)] |> min(tmax)
+
+    popn2 <- popn[, .(Tinf, Tdeath)]
+    N <- popn2[, .N]
+
+    X <- rbind(
+        data.table::data.table(
+          event = factor("start", c("start", "infection", "removal", "end")),
+          time = 0.0),
+        data.table::data.table(event = "infection", 
+                               time = purrr::list_c(popn$Tinf)),
+        data.table::data.table(event = "removal", 
+                               time = purrr::list_c(popn$Tdeath)),
+        data.table::data.table(event = "end",       time = tmax))
+
+    X <- X[is.finite(time)]
+
+    data.table::setorder(X, time)
+    #                                               S    I
+    X[event == "start",     (compartments) := list(+N,  +0L)]
+    X[event == "infection", (compartments) := list(-1L, +1L)]
+    X[event == "removal",   (compartments) := list(+1L, -1L)]
+    X[event == "end",       (compartments) := list(+0L, +0L)]
+
+    X[, event := NULL]
+    X[, S := cumsum(S)]
+    X[, I := cumsum(I)]
+
+    rbind(X[time == 0][.N],
+          X[time > 0 & time <= tmax]) |>
+        data.table::melt("time")
+  }
+
+  N <- ePop@nInd
+  tmax <- simParam$t_final * trim
+
+  events <- make_time_series_sis(ePop@dynamics, simParam, tmax)
+
+  ggplot2::ggplot(events) +
+    ggplot2::aes(x = time, y = value / N, colour = variable) +
+    ggplot2::geom_line(linewidth = 1.2) +
+    ggplot2::scale_colour_manual(
+      "Compartments", breaks = c("S", "I"),
+      labels = c("Susceptible", "Infectious"),
+      values = c("#3E9BFEFF", "#7A0403FF")) +
+    ggplot2::coord_cartesian(
+      xlim = c(0, min(tmax, max(events$time), na.rm = TRUE)), ylim = c(0, 1)) +
+    ggplot2::labs(x = "Time (days)", y = "Proportion", title = "SIS model") +
+    ggplot2::theme_bw()
+}
 
 
 ## ---- KM Plots -----
@@ -337,7 +368,8 @@ plot_SIR <- function(ePop, simParam, trim) {
 #' #'
 #' @returns A KM plot
 #' @export
-plot_km <- function(ePop, simParam = NULL) {
+plotKM <- function(ePop, simParam = NULL) {
+  # AlphaSimR standard way to assume SP is simulation parameter
   if(is.null(simParam)) simParam = get("SP", envir=.GlobalEnv)
   
   popn <- ePop@dynamics
@@ -354,24 +386,24 @@ plot_km <- function(ePop, simParam = NULL) {
   x[, RP := Tdeath - Tsign]
   
   x1 <- x[, .(Tsign = c(0, sort(Tsign, na.last = TRUE)),
-              RP    = c(0, sort(RP,    na.last = TRUE))),
-          .(sire)]
+              RP    = c(0, sort(RP,    na.last = TRUE))), .(sire)]
   x1[, grp := .GRP, .(sire)]
   x1[, survival := seq(1, 0, length.out = .N), grp]
   
   x2 <- data.table::melt(x1, measure.vars = c("Tsign", "RP"),
                          value.name = "time")
   
-  plt <- ggplot2::ggplot(x2, ggplot2::aes(x = time, 
-                                          y = survival, group = grp)) +
+  plt <- ggplot2::ggplot(
+    x2, ggplot2::aes(x = time, y = survival, group = grp)) +
     ggplot2::geom_line(colour = "red") +
     ggplot2::labs(x = "Time (days)",  y = "Survival") +
     ggplot2::facet_grid(
       cols = ggplot2::vars(variable), scales = "free_x",
       labeller = ggplot2::labeller(
-        variable = c(Tinf  = "Proportion of family uninfected vs time",
-                     Tsign ="Proportion of family with no visual signs vs time",
-                     RP    = "Proportion of family surviving vs time"))) +
+        variable = c(
+          Tinf  = "Proportion of family uninfected vs time",
+          Tsign ="Proportion of family with no visual signs vs time",
+          RP    = "Proportion of family surviving vs time"))) +
     ggplot2::theme_bw()
   
   plt

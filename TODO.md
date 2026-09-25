@@ -16,14 +16,14 @@
     - [x] Rename `run` to `runEpidemic`
 - [x] Convert rates (removal, latency, detection) to constant values and remove all distribution-implementation (following discussion with Andrea on Sep 4th)
 - [x] add versions
-- [ ] other plots
-    - [x] km plot
+- [x] km plot
+    - [ ] Fix km plot for SIS (or remove)
 
 ## Medium Priority
-- [ ] SIS
-    - [ ] model
-    - [ ] R0
-    - [ ] plot
+- [x] SIS
+    - [x] model
+    - [x] R0
+    - [x] plot
 ### Remove all warnings from devtool::build()
     - [ ] pheno traits (as strings) in `runEpidemic` to be replaced with proper placeholders
         - [ ] SIR
