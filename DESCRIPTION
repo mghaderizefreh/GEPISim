@@ -4,10 +4,15 @@ Title: What the Package Does (Title Case)
 Version: 0.15.1.9000
 Date: 2026-04-15
 Authors@R: c(
-    person("Masoud", "Ghaderi Zefreh", role = c("aut", "cre"), 
-    email = "mghaderi@ed.ac.uk",comment = c(ORCID = "0000-0002-7656-2718"))
+    person("Masoud", "Ghaderi Zefreh", , "mghaderi@ed.ac.uk", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0002-7656-2718")),
+    person("Gregor", "Gorjanc", role = "ctb",
+           comment = c(ORCID = "0000-0001-8008-2787")),
+    person("Jamie", "Prentice", role = "ctb",
+           comment = c(ORCID = "0000-0002-5672-2163")),
+    person("Andrea", "Doeschl-Wilson", role = "ctb",
+           comment = c(ORCID = "0000-0002-2658-6973"))
   )
-Maintainer: Masoud Ghaderi Zefreh <mghaderi@ed.ac.uk>
 Description: More about what it does (maybe more than one line).
     Continuation lines should be indented.
 License: MIT + file LICENSE
