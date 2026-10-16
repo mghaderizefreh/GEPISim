@@ -8,7 +8,7 @@ test_that("newPopEpidemic basic construction and defaults work", {
   SP <- SimParamEpidemic$new(founderPop, model = "SIR")
   SP$addTraitA(nQtlPerChr = 10, mean = c(0,0,0), var = rep(1,3),
                corA = diag(rep(1,3)), name = c('sus', 'inf', 'tol'))
-  
+
   ep <- newPopEpidemic(founderPop, simParam = SP)
 
   # Class inheritance
@@ -79,7 +79,7 @@ test_that("newPopEpidemic error handling works", {
   # simParam must be SimParamEpidemic; AlphaSimR SimParam is not enough
   pop <- AlphaSimR::newPop(founderPop, simParam = SPbase)
   expect_error(asPopEpidemic(pop, simParam = SPbase),"SimParamEpidemic")
-  
+
 
   # group_list length mismatch
   expect_error(newPopEpidemic(founderPop, group_list = rep(1L, 4), simParam = SP),
@@ -105,16 +105,4 @@ test_that("newPopEpidemic error handling works", {
                           indCases = c(1, 0, 0, 0, 0),
                           simParam = SP),
                "Each group must have at least one case")
-})
-
-test_that("show(PopEpidemic) prints expected summary", {
-  skip_if_not_installed("AlphaSimR")
-
-  founderPop <- AlphaSimR::quickHaplo(nInd = 3, nChr = 1, segSites = 50)
-  SP <- SimParamEpidemic$new(founderPop, model = "SIR")
-  ones <- rep(1.,3)
-  SP$addTraitA(nQtlPerChr = 5, mean = ones-1, var = ones, corA = diag(ones),
-               name= c('sus', 'inf', 'tol'))
-  ep <- newPopEpidemic(founderPop, simParam = SP)
-  expect_output(show(ep), "Model: SIR", fixed = TRUE)
 })

@@ -6,6 +6,7 @@
 \alias{show,PopEpidemic-method}
 \alias{initDynamics}
 \alias{asPopEpidemic}
+\alias{[,PopEpidemic-method}
 \title{Epidemic Population}
 \usage{
 \S4method{show}{PopEpidemic}(object)
@@ -13,6 +14,8 @@
 initDynamics(ePop, simParam = NULL)
 
 asPopEpidemic(from, group_list = NULL, indCases = NULL, simParam = NULL)
+
+\S4method{[}{PopEpidemic}(x, i)
 }
 \arguments{
 \item{ePop}{an \code{\link{PopEpidemic-class}} object}
@@ -45,9 +48,13 @@ The dynamics field is data.table with several columns,
 \item \strong{\code{generation}}: Infection type (e.g., primary, secondary). Set to \code{1} for
 index cases.
 \item \strong{\code{infected_by}}: Index of the infector.
-\item \strong{\code{group_inf}}: Group-level infectivity.
 }
 }
+\section{Methods (by generic)}{
+\itemize{
+\item \code{[}: Extract PopEpidemic by index or id
+
+}}
 \section{Functions}{
 \itemize{
 \item \code{show(PopEpidemic)}: Show epidemic population summary

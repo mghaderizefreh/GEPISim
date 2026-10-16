@@ -17,7 +17,7 @@ test_that("constructor sets default arguments correctly", {
 
   # Model-dependent defaults for SIR
   expect_identical(sp$epi_traits, c(s = "sus", i = "inf", t = "tol"))
-  expect_identical(sp$timings, c("Tinf", "Tdeath"))
+  expect_identical(sp$timings, c("Tinf", "Texit"))
 })
 
 test_that("constructor sets custom arguments correctly", {
@@ -57,7 +57,7 @@ test_that("constructor accepts model value case-insensitively (as documented)", 
     # Ensure model-dependent components are set correctly even if lower-case was passed
     expect_identical(sp$model, "SIR")
     expect_identical(sp$epi_traits, c(s = "sus", i = "inf", t = "tol"))
-    expect_identical(sp$timings, c("Tinf", "Tdeath"))
+    expect_identical(sp$timings, c("Tinf", "Texit"))
   })
 })
 

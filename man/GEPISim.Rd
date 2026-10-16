@@ -11,4 +11,16 @@ Currently in development
 \author{
 \strong{Maintainer}: Masoud Ghaderi Zefreh \email{mghaderi@ed.ac.uk} (\href{https://orcid.org/0000-0002-7656-2718}{ORCID})
 
+Authors:
+\itemize{
+  \item Masoud Ghaderi Zefreh \email{mghaderi@ed.ac.uk} (\href{https://orcid.org/0000-0002-7656-2718}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Gregor Gorjanc (\href{https://orcid.org/0000-0001-8008-2787}{ORCID}) [contributor]
+  \item Jamie Prentice (\href{https://orcid.org/0000-0002-5672-2163}{ORCID}) [contributor]
+  \item Andrea Doeschl-Wilson (\href{https://orcid.org/0000-0002-2658-6973}{ORCID}) [contributor]
+}
+
 }

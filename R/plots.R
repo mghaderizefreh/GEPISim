@@ -8,11 +8,11 @@
 #' @returns A plot of the epidemic
 #' @export
 plotModel <- function(ePop, simParam = NULL, trim = 0.95) {
-  
+
   if(is.null(simParam)){
     simParam = get("SP", envir=.GlobalEnv)
   }
-  
+
   switch(simParam$model,
          "SIR" = plot_SIR(ePop, simParam, trim),
          "SIS" = plot_SIS(ePop, simParam, trim),
@@ -33,8 +33,8 @@ plot_SEIDR <- function(ePop, simParam, trim) {
   make_time_series_seidr <- function(popn, params, tmax = tmax) {
     compartments <- simParam$compartments |> unlist()
 
-    popn2 <- popn[, .(Tinf, Tinc, Tsign, Tdeath)]
-    popn2[is.na(Tsign), Tsign := Tdeath]
+    popn2 <- popn[, .(Tinf, Tinc, Tsign, Texit)]
+    popn2[is.na(Tsign), Tsign := Texit]
     popn2[is.na(Tinc),  Tinc  := Tsign]
     popn2[is.na(Tinf),  Tinf  := Tinc]
 
@@ -47,7 +47,7 @@ plot_SEIDR <- function(ePop, simParam, trim) {
       data.table::data.table(event = "infection",  time = popn2$Tinf),
       data.table::data.table(event = "incubation", time = popn2$Tinc),
       data.table::data.table(event = "detection",  time = popn2$Tsign),
-      data.table::data.table(event = "removal",    time = popn2$Tdeath),
+      data.table::data.table(event = "removal",    time = popn2$Texit),
       data.table::data.table(event = "end", time = tmax))
 
     X <- X[is.finite(time)]
@@ -76,7 +76,7 @@ plot_SEIDR <- function(ePop, simParam, trim) {
 
   N <- ePop@nInd
 
-  tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
+  tmax <- quantile(ePop@dynamics$Texit, na.rm = TRUE, prob = trim)[[1]]
 
   events <- make_time_series_seidr(ePop@dynamics, simParam, tmax)
 
@@ -107,8 +107,8 @@ plot_SIDR <- function(ePop, simParam, trim) {
   make_time_series_sidr <- function(popn, params, tmax = tmax) {
     compartments <- simParam$compartments |> unlist()
 
-    popn2 <- popn[, .(Tinf, Tsign, Tdeath)]
-    popn2[is.na(Tsign), Tsign := Tdeath]
+    popn2 <- popn[, .(Tinf, Tsign, Texit)]
+    popn2[is.na(Tsign), Tsign := Texit]
     popn2[is.na(Tinf),  Tinf  := Tsign]
 
     N <- popn2[, .N]
@@ -119,7 +119,7 @@ plot_SIDR <- function(ePop, simParam, trim) {
                                   "end")), time = 0.0),
       data.table::data.table(event = "infection", time = popn2$Tinf),
       data.table::data.table(event = "detection", time = popn2$Tsign),
-      data.table::data.table(event = "removal",   time = popn2$Tdeath),
+      data.table::data.table(event = "removal",   time = popn2$Texit),
       data.table::data.table(event = "end",       time = tmax))
 
     X <- X[is.finite(time)]
@@ -146,7 +146,7 @@ plot_SIDR <- function(ePop, simParam, trim) {
 
   N <- ePop@nInd
 
-  tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
+  tmax <- quantile(ePop@dynamics$Texit, na.rm = TRUE, prob = trim)[[1]]
 
   events <- make_time_series_sidr(ePop@dynamics, simParam, tmax)
 
@@ -177,8 +177,8 @@ plot_SEIR <- function(ePop, simParam, trim) {
   make_time_series_seir <- function(popn, params, tmax = tmax) {
     compartments <- simParam$compartments |> unlist()
 
-    popn2 <- popn[, .(Tinf, Tsign, Tdeath)]
-    popn2[is.na(Tsign), Tsign := Tdeath]
+    popn2 <- popn[, .(Tinf, Tsign, Texit)]
+    popn2[is.na(Tsign), Tsign := Texit]
     popn2[is.na(Tinf),  Tinf  := Tsign]
 
     N <- popn2[, .N]
@@ -189,7 +189,7 @@ plot_SEIR <- function(ePop, simParam, trim) {
                                   "end")), time = 0.0),
       data.table::data.table(event = "infection",  time = popn2$Tinf),
       data.table::data.table(event = "incubation", time = popn2$Tsign),
-      data.table::data.table(event = "removal",    time = popn2$Tdeath),
+      data.table::data.table(event = "removal",    time = popn2$Texit),
       data.table::data.table(event = "end",        time = tmax))
 
     X <- X[is.finite(time)]
@@ -212,10 +212,10 @@ plot_SEIR <- function(ePop, simParam, trim) {
           X[time > 0 & time <= tmax]) |>
       data.table::melt("time")
   }
-  
+
   N <- ePop@nInd
 
-  tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
+  tmax <- quantile(ePop@dynamics$Texit, na.rm = TRUE, prob = trim)[[1]]
 
   events <- make_time_series_seir(ePop@dynamics, simParam, tmax)
 
@@ -244,8 +244,8 @@ plot_SIR <- function(ePop, simParam, trim) {
   make_time_series_sir <- function(popn, simParam, tmax = tmax) {
     compartments <- simParam$compartments |> unlist()
 
-    popn2 <- popn[, .(Tinf, Tdeath)]
-    popn2[is.na(Tinf), Tinf := Tdeath]
+    popn2 <- popn[, .(Tinf, Texit)]
+    popn2[is.na(Tinf), Tinf := Texit]
 
     N <- popn2[, .N]
 
@@ -254,7 +254,7 @@ plot_SIR <- function(ePop, simParam, trim) {
         event = factor("start", c("start", "infection","removal", "end")),
         time = 0.0),
       data.table::data.table(event = "infection", time = popn2$Tinf),
-      data.table::data.table(event = "removal",   time = popn2$Tdeath),
+      data.table::data.table(event = "removal",   time = popn2$Texit),
       data.table::data.table(event = "end",       time = tmax))
 
     X <- X[is.finite(time)]
@@ -278,7 +278,7 @@ plot_SIR <- function(ePop, simParam, trim) {
 
   N <- ePop@nInd
 
-  tmax <- quantile(ePop@dynamics$Tdeath, na.rm = TRUE, prob = trim)[[1]]
+  tmax <- quantile(ePop@dynamics$Texit, na.rm = TRUE, prob = trim)[[1]]
 
   events <- make_time_series_sir(ePop@dynamics, simParam, tmax)
 
@@ -304,21 +304,21 @@ plot_SIR <- function(ePop, simParam, trim) {
 plot_SIS <- function(ePop, simParam, trim) {
   make_time_series_sis <- function(popn, params, tmax = tmax) {
     compartments <- simParam$compartments |> unlist() |> unique()
-    
-    tmax <- popn[, purrr::map_dbl(Tdeath, last) |> 
+
+    tmax <- popn[, purrr::map_dbl(Texit, last) |>
                    max(na.rm = TRUE)] |> min(tmax)
 
-    popn2 <- popn[, .(Tinf, Tdeath)]
+    popn2 <- popn[, .(Tinf, Texit)]
     N <- popn2[, .N]
 
     X <- rbind(
         data.table::data.table(
           event = factor("start", c("start", "infection", "removal", "end")),
           time = 0.0),
-        data.table::data.table(event = "infection", 
+        data.table::data.table(event = "infection",
                                time = purrr::list_c(popn$Tinf)),
-        data.table::data.table(event = "removal", 
-                               time = purrr::list_c(popn$Tdeath)),
+        data.table::data.table(event = "removal",
+                               time = purrr::list_c(popn$Texit)),
         data.table::data.table(event = "end",       time = tmax))
 
     X <- X[is.finite(time)]
@@ -371,28 +371,28 @@ plot_SIS <- function(ePop, simParam, trim) {
 plotKM <- function(ePop, simParam = NULL) {
   # AlphaSimR standard way to assume SP is simulation parameter
   if(is.null(simParam)) simParam = get("SP", envir=.GlobalEnv)
-  
+
   popn <- ePop@dynamics
-  cols <- intersect(c("Tinf", "Tsign", "Tdeath"),
+  cols <- intersect(c("Tinf", "Tsign", "Texit"),
                     names(popn))
-  
+
   x <- popn[, ..cols]
   x[, sire := ePop@father]
-  
+
   if ("Tsign" %notin% names(x)) {
     x[, Tsign := Tinf]
   }
-  
-  x[, RP := Tdeath - Tsign]
-  
+
+  x[, RP := Texit - Tsign]
+
   x1 <- x[, .(Tsign = c(0, sort(Tsign, na.last = TRUE)),
               RP    = c(0, sort(RP,    na.last = TRUE))), .(sire)]
   x1[, grp := .GRP, .(sire)]
   x1[, survival := seq(1, 0, length.out = .N), grp]
-  
+
   x2 <- data.table::melt(x1, measure.vars = c("Tsign", "RP"),
                          value.name = "time")
-  
+
   plt <- ggplot2::ggplot(
     x2, ggplot2::aes(x = time, y = survival, group = grp)) +
     ggplot2::geom_line(colour = "red") +
@@ -405,6 +405,6 @@ plotKM <- function(ePop, simParam = NULL) {
           Tsign ="Proportion of family with no visual signs vs time",
           RP    = "Proportion of family surviving vs time"))) +
     ggplot2::theme_bw()
-  
+
   plt
 }

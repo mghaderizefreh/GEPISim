@@ -5,10 +5,14 @@
 #' @param ePop A \code{\link{PopEpidemic-class}} object with infection
 #'  generations.
 #' @param simParam simulation parameter of type \code{\link{SimParamEpidemic}}
+#' @param aggfunc R0 is a population quantity but here we obtain individual R0s.
+#'  The aggfunc determines how these individual quantities are aggregated for a
+#'  population level R0. As the distribution is usually skewed only median is 
+#'  recommended. 
 #'
 #' @returns R0 as the basic reproductive ratio
 #' @export
-get_R0 <- function(ePop, simParam = NULL) {
+getR0 <- function(ePop, simParam = NULL, aggfunc = median) {
   if(is.null(simParam)){
     simParam = get("SP",envir=.GlobalEnv)
   }
@@ -23,7 +27,7 @@ get_R0 <- function(ePop, simParam = NULL) {
           ePop@pheno[i, 'inf'] *
           simParam$removal_period * ePop@pheno[i, 'tol']
       ), numeric(1))
-    return(median(R0s))
+    return(aggfunc(R0s))
   } else if (simParam$model %in%  c("SIDR", "SEIDR")){
     R0s <- vapply(
       1:ePop@nInd,
@@ -36,10 +40,10 @@ get_R0 <- function(ePop, simParam = NULL) {
               simParam$detection_period * ePop@pheno[i, 'det']
           )
       ), numeric(1))
-    return(median(R0s))
+    return(aggfunc(R0s))
   } else{
     # not-handled model
-    warning(paste("Modle", simParam$model,"is not allowed"))
+    warning(paste("Model", simParam$model,"is not allowed"))
     return(NA)
   }
 }

@@ -82,9 +82,6 @@ setMethod("show",
           function (object){
             # Call the parent class's show method
             callNextMethod()
-            # Add the epidemic-specific information
-            cat("Model:", paste0(levels(object@dynamics$status),collapse = ''),
-                "\n")
             invisible()
           }
 )
@@ -106,8 +103,6 @@ setMethod("show",
 #' index cases.
 #'
 #' - **`infected_by`**: Index of the infector.
-#'
-#' - **`group_inf`**: Group-level infectivity.
 #'
 #' @export
 initDynamics <- function(ePop, simParam=NULL){
@@ -181,7 +176,7 @@ asPopEpidemic <- function(from, group_list = NULL, indCases = NULL,
       stop(sprintf("Each group must have at least one case"))
     }
   }
-  
+
   # check traits, i.e., if we indeed have the phenotypes we need
   for (epitrait in simParam$epi_traits){
     if (!epitrait %in% colnames(from@pheno)) {
@@ -203,3 +198,14 @@ asPopEpidemic <- function(from, group_list = NULL, indCases = NULL,
 
   initDynamics(out, simParam)
 }
+
+#' @describeIn PopEpidemic Extract PopEpidemic by index or id
+setMethod("[",
+          signature(x = "PopEpidemic"),
+          function(x, i){
+            x <- callNextMethod(x,i)
+            x@dynamics <- x@dynamics[i,]
+            return(x)
+          }
+)
+

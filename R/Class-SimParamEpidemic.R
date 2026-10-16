@@ -42,9 +42,9 @@ SimParamEpidemic <- R6::R6Class(
     #'   "E" (latent, non-infectious) state before becoming infectious "I".
     #'   Only consumed by models with an "E" compartment (e.g. SEIR).
     latent_period = NA_real_,
-    
+
     # final time ----
-    #' @field t_final final time for simulating. This is needed for SIS model, 
+    #' @field t_final final time for simulating. This is needed for SIS model,
     #'  though it can be relevant for other models. Default value is NULL which
     #'  will be 20/gamma
     t_final = NA_real_,
@@ -87,8 +87,9 @@ SimParamEpidemic <- R6::R6Class(
     #'
     #' @param latent_period \code{\link[GEPISim]{SimParamEpidemic}} field
     #'   \code{latent_period}
-    #'   
-    #' @param t_final final time of simulation if epidemic does not stop
+    #'
+    #' @param t_final final time of simulation if epidemic does not stop.
+    #'   Default is 10*removal_period
     #'
     #' @examples
     #' founderGenomes <- quickHaplo(nInd = 10, nChr = 3, segSites = 10)
@@ -121,9 +122,9 @@ SimParamEpidemic <- R6::R6Class(
 
       # latent period (used by E-models such as SEIR)
       self$latent_period <- latent_period
-      
+
       # default value for t_final
-      self$t_final <- ifelse(is.null(t_final), 20*removal_period, t_final)
+      self$t_final <- ifelse(is.null(t_final), 10*removal_period, t_final)
 
       self$compartments <- strsplit(model, split = "")[[1]] |> unique() |>
         as.list()
@@ -134,6 +135,12 @@ SimParamEpidemic <- R6::R6Class(
         pheno <- asLogNormal(pheno)
         return(pheno)
       }
+      
+      message(
+        paste0("Model ", model, " is set with trait names ", 
+               paste0("\"",self$epi_traits, "\"", collapse = "", sep=", "),
+               "respectively, for the ", length(unlist(strsplit(model,""))),
+               " traits."))
 
       invisible(self)
     }
@@ -152,19 +159,19 @@ SimParamEpidemic <- R6::R6Class(
       switch(toupper(self$model),
              "SEIDR" = {
                self$epi_traits <- private$.all_traits
-               self$timings <- c("Tinf", "Tinc", "Tsign", "Tdeath")
+               self$timings <- c("Tinf", "Tinc", "Tsign", "Texit")
              }, "SIDR" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "d", "t")]
-               self$timings <- c("Tinf", "Tsign", "Tdeath")
+               self$timings <- c("Tinf", "Tsign", "Texit")
              }, "SEIR" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "l", "t")]
-               self$timings <- c("Tinf", "Tsign", "Tdeath")
+               self$timings <- c("Tinf", "Tsign", "Texit")
              }, "SIR" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "t")]
-               self$timings <- c("Tinf", "Tdeath")
+               self$timings <- c("Tinf", "Texit")
              }, "SIS" = {
                self$epi_traits <- private$.all_traits[c("s", "i", "t")]
-               self$timings <- c("Tinf", "Tdeath")
+               self$timings <- c("Tinf", "Texit")
              }, "SI" = {
                self$epi_traits <- private$.all_traits[c("s", "i")]
                self$timings <- c("Tinf")
